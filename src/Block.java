@@ -12,6 +12,8 @@ public abstract class Block {
 	public abstract int[][] rotation();
 
 	public abstract Color getColor();
+	
+	public abstract int[][] getLocation();
 }
 
 class O_Block extends Block {
@@ -31,6 +33,11 @@ class O_Block extends Block {
 	@Override
 	public Color getColor() {
 		return Color.RED;
+	}
+
+	@Override
+	public int[][] getLocation() {
+		return location;
 	}
 }
 
@@ -59,23 +66,38 @@ class I_Block extends Block {
 	public Color getColor() {
 		return Color.YELLOW;
 	}
+	
+	@Override
+	public int[][] getLocation() {
+		return location;
+	}
 }
 
 class S_Block extends Block {
 	private int[][] location = { { -1, -1 }, { 0, -1 }, { 0, 0 }, { 1, 0 } };
-
+	private boolean ck = true;
+	
 	@Override
 	public int[][] getBlock() {
 		return location;
 	}
 
 	@Override
-	public int[][] rotation() {
+	public int[][] rotation() {								// 처음엔 x 두번째는 y 에 바꾸고 -1 곱해야 함
 		int[][] rotateLocation = new int[4][2];
 
-		for (int i = 0; i < location.length; i++) {
-			rotateLocation[i][0] = location[i][1];
-			rotateLocation[i][1] = -location[i][0];
+		if (ck) {
+			for (int i = 0; i < location.length; i++) {
+				rotateLocation[i][0] = -location[i][1];
+				rotateLocation[i][1] = location[i][0];
+				ck = false;
+			}
+		} else {
+			for (int i = 0; i < location.length; i++) {
+				rotateLocation[i][0] = location[i][1];
+				rotateLocation[i][1] = -location[i][0];
+				ck = true;
+			}
 		}
 		location = rotateLocation;
 		return location;
@@ -85,11 +107,17 @@ class S_Block extends Block {
 	public Color getColor() {
 		return Color.GREEN;
 	}
+	
+	@Override
+	public int[][] getLocation() {
+		return location;
+	}
 }
 
 class Z_Block extends Block {
 	private int[][] location = { { -1, 0 }, { 0, -1 }, { 0, 0 }, { 1, -1 } };
-
+	private boolean ck = true;
+	
 	@Override
 	public int[][] getBlock() {
 		return location;
@@ -99,9 +127,18 @@ class Z_Block extends Block {
 	public int[][] rotation() {
 		int[][] rotateLocation = new int[4][2];
 
-		for (int i = 0; i < location.length; i++) {
-			rotateLocation[i][0] = location[i][1];
-			rotateLocation[i][1] = -location[i][0];
+		if (ck) {
+			for (int i = 0; i < location.length; i++) {
+				rotateLocation[i][0] = -location[i][1];
+				rotateLocation[i][1] = location[i][0];
+				ck = false;
+			}
+		} else {
+			for (int i = 0; i < location.length; i++) {
+				rotateLocation[i][0] = location[i][1];
+				rotateLocation[i][1] = -location[i][0];
+				ck = true;
+			}
 		}
 		location = rotateLocation;
 		return location;
@@ -110,6 +147,11 @@ class Z_Block extends Block {
 	@Override
 	public Color getColor() {
 		return Color.BLUE;
+	}
+	
+	@Override
+	public int[][] getLocation() {
+		return location;
 	}
 }
 
@@ -137,6 +179,11 @@ class L_Block extends Block {
 	public Color getColor() {
 		return Color.ORANGE;
 	}
+	
+	@Override
+	public int[][] getLocation() {
+		return location;
+	}
 }
 
 class J_Block extends Block {
@@ -163,6 +210,11 @@ class J_Block extends Block {
 	public Color getColor() {
 		return Color.MAGENTA;
 	}
+	
+	@Override
+	public int[][] getLocation() {
+		return location;
+	}
 }
 
 class T_Block extends Block {
@@ -188,5 +240,10 @@ class T_Block extends Block {
 	@Override
 	public Color getColor() {
 		return Color.WHITE;
+	}
+	
+	@Override
+	public int[][] getLocation() {
+		return location;
 	}
 }

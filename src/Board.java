@@ -26,7 +26,7 @@ public class Board{
 	}
 
 	public void makeBlock() { 								// 블록 생성
-		int blockNum = (int) (Math.random() * 6);
+		int blockNum = (int) (Math.random() * 7);
 		int[][] location = new int[4][2];
 
 		switch (blockNum) {
@@ -63,8 +63,8 @@ public class Board{
 	public void addBlock(int[][] location, Color color) { 	// 보드에 블록 추가
 		int[][] XY = new int[4][2];
 		for (int i = 0; i < location.length; i++) {
-			XY[i][0] = location[i][1] + 1;
-			XY[i][1] = ((location[i][0]) + (boardW / 2));
+			XY[i][0] = -1*location[i][1];					// y축
+			XY[i][1] = ((location[i][0]) + (boardW / 2));	// x축
 		}
 		for (int i = 0; i < XY.length; i++) {
 			board[XY[i][0]][XY[i][1]] = color;
@@ -75,17 +75,15 @@ public class Board{
 	
 	public void addBlock(int[][] location){
 		int[][] XY = new int[4][2];
-		int x = currentBlockLocation[2][0];						//(0, 0) 자리임 
-		int y = currentBlockLocation[2][1];
+		int x = currentBlockLocation[2][1];						//(0, 0) 자리임 
+		int y = currentBlockLocation[2][0];
 		
-		for (int i = 0; i < location.length; i++) {
-			XY[i][0] = location[i][1] + x;
-			XY[i][1] = location[i][0] + y;
-		}
 		for (int i = 0; i < XY.length; i++) {
-			board[XY[i][0]][XY[i][1]] = getCurrentBlockColor();
-			currentBlockLocation[i][0] = XY[i][0];
-			currentBlockLocation[i][1] = XY[i][1];
+
+			System.out.println(location[i][0] + ", " + location[i][1] );
+			board[location[i][0] + y][location[i][1] + x] = getCurrentBlockColor();
+			currentBlockLocation[i][0] = location[i][0] + y;
+			currentBlockLocation[i][1] = location[i][1] + x;
 		}
 	}
 
@@ -104,7 +102,7 @@ public class Board{
 			case KeyEvent.VK_UP:
 				currentBlockInit();
 				if(checkRotation(block.rotation())){
-					addBlock(block.rotation());
+					System.out.println("회전");
 				}
 				else{
 					returnBlock();
@@ -144,22 +142,29 @@ public class Board{
 	}
 	
 	public void returnBlock(){
-		for (int i = 0; i < currentBlockLocation.length; i++) {													// 현재 블록 위치 초기화
+		for (int i = 0; i < currentBlockLocation.length; i++) {													// 현재 블록 위치 복구
 			this.board[currentBlockLocation[i][0]][currentBlockLocation[i][1]] = getCurrentBlockColor();
 		}
 	}
 	
 	public boolean checkRotation(int[][] location){
-		int[][] XY = new int[4][2];
-		int x = currentBlockLocation[2][0];						//(0, 0) 자리임 
-		int y = currentBlockLocation[2][1];
+		int x = currentBlockLocation[2][1];						//(0, 0) 자리임 
+		int y = currentBlockLocation[2][0];
 		
-		for (int i = 0; i < location.length; i++) {
-			if(board[location[i][0] + y][location[i][1] + x] != initBoard){
-				return false;
+		try {
+			for (int i = 0; i < location.length; i++) {
+				System.out.println(location[i][0] + ", " + location[i][1] );
+				if (board[location[i][0] + y][location[i][1] + x] != initBoard) {
+					System.out.println("실패");
+					return false;
+				}
 			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			System.out.println("초과");
+			return false;
 		}
-		
+
+		addBlock(location);
 		return true;
 	}
 	
@@ -177,16 +182,16 @@ public class Board{
 		return moveOk;
 	}
 	
+	/* 
 	public void checkTouch(int RL){
-		for (int i = 0; i < currentBlockLocation.length; i++) {													// 아래 칸으로 이동 가능한지 확인
+		for (int i = 0; i < currentBlockLocation.length; i++) {													
 			System.out.println(this.board[currentBlockLocation[i][0] + 1][currentBlockLocation[i][1] + RL]);
 			if (this.board[currentBlockLocation[i][0] + 1][currentBlockLocation[i][1]] != initBoard) {
-				System.out.println("내려가기");
 				setTouchFloor(true);
 			}
 		}
 	}
-	
+	*/
 	public void BlockDown(boolean[] moveOk){
 		if (isFalse(moveOk)) {																					// 블록 이동 가능시 이동, 불가능시 복원
 			for (int i = 0; i < currentBlockLocation.length; i++) {

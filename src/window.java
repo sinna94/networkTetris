@@ -55,7 +55,7 @@ public class window extends JFrame implements KeyListener{
 		
 		
 		Thread t = new Thread(new DownThread());
-		t.start();
+	//	t.start();
 		
 		window.board.makeBlock();
 	}
@@ -124,7 +124,6 @@ class gamePanel extends JPanel {
 
 		
 		if (Board.getTouchFloor()) {			// 블록이 내려갈 수 없을 때 새로운 블록을 만듬
-			System.out.println("바닥");
 			window.board.makeBlock();
 			Board.setTouchFloor(false);
 		}
