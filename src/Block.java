@@ -1,12 +1,14 @@
 import java.awt.Color;
 
-public abstract class Block {
+public abstract class Block implements Cloneable{
 	/*
 	 * private int O_block = 1; private int I_block = 2; private int S_block =
 	 * 3; private int Z_block = 4; private int L_block = 5; private int J_block
 	 * = 6; private int T_block = 7;
 	 */
 
+	private int[][] location;
+	
 	public abstract int[][] getBlock();
 
 	public abstract int[][] rotation();
@@ -14,6 +16,16 @@ public abstract class Block {
 	public abstract Color getColor();
 	
 	public abstract int[][] getLocation();
+	
+	public abstract void setLocation(int[][] location);
+	
+	public Object clone() {							// 블록 복사를 위해서
+		try {
+			return super.clone();
+		} catch (CloneNotSupportedException e) {
+			return null;
+		}
+	}
 }
 
 class O_Block extends Block {
@@ -38,6 +50,11 @@ class O_Block extends Block {
 	@Override
 	public int[][] getLocation() {
 		return location;
+	}
+
+	@Override
+	public void setLocation(int[][] location) {
+		this.location = location;		
 	}
 }
 
@@ -70,6 +87,11 @@ class I_Block extends Block {
 	@Override
 	public int[][] getLocation() {
 		return location;
+	}
+	
+	@Override
+	public void setLocation(int[][] location) {
+		this.location = location;		
 	}
 }
 
@@ -112,6 +134,11 @@ class S_Block extends Block {
 	public int[][] getLocation() {
 		return location;
 	}
+	
+	@Override
+	public void setLocation(int[][] location) {
+		this.location = location;		
+	}
 }
 
 class Z_Block extends Block {
@@ -153,6 +180,11 @@ class Z_Block extends Block {
 	public int[][] getLocation() {
 		return location;
 	}
+	
+	@Override
+	public void setLocation(int[][] location) {
+		this.location = location;		
+	}
 }
 
 class L_Block extends Block {
@@ -183,6 +215,11 @@ class L_Block extends Block {
 	@Override
 	public int[][] getLocation() {
 		return location;
+	}
+	
+	@Override
+	public void setLocation(int[][] location) {
+		this.location = location;		
 	}
 }
 
@@ -215,6 +252,11 @@ class J_Block extends Block {
 	public int[][] getLocation() {
 		return location;
 	}
+	
+	@Override
+	public void setLocation(int[][] location) {
+		this.location = location;		
+	}
 }
 
 class T_Block extends Block {
@@ -245,5 +287,10 @@ class T_Block extends Block {
 	@Override
 	public int[][] getLocation() {
 		return location;
+	}
+	
+	@Override
+	public void setLocation(int[][] location) {
+		this.location = location;		
 	}
 }

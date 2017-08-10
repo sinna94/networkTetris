@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 public class Board{
 
@@ -9,9 +10,12 @@ public class Board{
 	private Color[][] board = new Color[boardH][boardW];
 	private static int[][] currentBlockLocation = new int[4][2];
 	private static Color currentBlockColor = null;
+	private static Block currentBlock;
 	private Color initBoard = Color.GRAY;
 	private static boolean touchFloor = false;
 	private static Block block = null;
+	private int topLine;
+	private int fullLine;
 	
 	public Board() {
 		for (int i = 0; i < boardH; i++) {					// 보드 초기화
@@ -54,14 +58,25 @@ public class Board{
 		default:
 			break;
 		}
-
+		
 		location = block.getBlock();
 		setCurrentBlockColor(block.getColor());
 		addBlock(location, getCurrentBlockColor());
+		block.rotation();								// 처음 회전 씹히는 것 때문에 넣음
 	}
 
-	public void addBlock(int[][] location, Color color) { 	// 보드에 블록 추가
+	public void addBlock(int[][] location, Color color) { 	// 보드에 블록 추가	, 나중에 트라이 캐치 써서 블록 넣을 자리 없는지 확인
 		int[][] XY = new int[4][2];
+		
+		for (int i = boardH - 1; i >= 0; i--) {			
+			if(isFull(board[i])){
+				fullLine = i;
+				delLine(fullLine);
+				downLine(fullLine);
+				topLine++;
+			}
+		}
+		
 		for (int i = 0; i < location.length; i++) {
 			XY[i][0] = -1*location[i][1];					// y축
 			XY[i][1] = ((location[i][0]) + (boardW / 2));	// x축
@@ -71,6 +86,8 @@ public class Board{
 			currentBlockLocation[i][0] = XY[i][0];
 			currentBlockLocation[i][1] = XY[i][1];
 		}
+		
+		
 	}
 	
 	public void addBlock(int[][] location){
@@ -79,8 +96,6 @@ public class Board{
 		int y = currentBlockLocation[2][0];
 		
 		for (int i = 0; i < XY.length; i++) {
-
-			System.out.println(location[i][0] + ", " + location[i][1] );
 			board[location[i][0] + y][location[i][1] + x] = getCurrentBlockColor();
 			currentBlockLocation[i][0] = location[i][0] + y;
 			currentBlockLocation[i][1] = location[i][1] + x;
@@ -97,12 +112,14 @@ public class Board{
 				currentBlockInit();
 				moveOk = checkBlockDown();
 				BlockDown(moveOk);
+				top();
 				break;
 				
 			case KeyEvent.VK_UP:
 				currentBlockInit();
-				if(checkRotation(block.rotation())){
-					System.out.println("회전");
+				currentBlock = (Block) block.clone();
+				if(checkRotation(currentBlock.rotation())){
+					addBlock(block.rotation());
 				}
 				else{
 					returnBlock();
@@ -153,18 +170,15 @@ public class Board{
 		
 		try {
 			for (int i = 0; i < location.length; i++) {
-				System.out.println(location[i][0] + ", " + location[i][1] );
 				if (board[location[i][0] + y][location[i][1] + x] != initBoard) {
-					System.out.println("실패");
 					return false;
 				}
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
-			System.out.println("초과");
 			return false;
 		}
 
-		addBlock(location);
+		
 		return true;
 	}
 	
@@ -182,16 +196,6 @@ public class Board{
 		return moveOk;
 	}
 	
-	/* 
-	public void checkTouch(int RL){
-		for (int i = 0; i < currentBlockLocation.length; i++) {													
-			System.out.println(this.board[currentBlockLocation[i][0] + 1][currentBlockLocation[i][1] + RL]);
-			if (this.board[currentBlockLocation[i][0] + 1][currentBlockLocation[i][1]] != initBoard) {
-				setTouchFloor(true);
-			}
-		}
-	}
-	*/
 	public void BlockDown(boolean[] moveOk){
 		if (isFalse(moveOk)) {																					// 블록 이동 가능시 이동, 불가능시 복원
 			for (int i = 0; i < currentBlockLocation.length; i++) {
@@ -289,7 +293,49 @@ public class Board{
 	public static void setTouchFloor(boolean touchFloor) {
 		Board.touchFloor = touchFloor;
 	}
+	
+	public void top(){
+		for (int i = boardH - 1; i >= 0; i--) {
+			if(isBlock(board[i])){
+				topLine = boardH - i;
+			}
+			
+			if(isFull(board[i])){
+				fullLine = i;
+				delLine(fullLine);
+				downLine(fullLine);
+				topLine--;
+			}
+		}
+	}
+	
+	public boolean isBlock(Color[] line){
+		for (int i = 0; i < line.length; i++) {
+			if (line[i] != initBoard) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isFull(Color[]line){
+		for (int i = 0; i < line.length; i++) {
+			if (line[i] == initBoard) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public void delLine(int num){
+		for(int i = 0; i<boardW ; i++){
+			board[num][i] = initBoard;
+		}
+	}
+	
+	public void downLine(int num){
+		for(int i = num - 1; i >= topLine ; i--){
+			board[i + 1] = board[i]; 
+		}
+	}
 }
-
-
-
