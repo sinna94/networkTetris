@@ -16,6 +16,7 @@ public class Board{
 	private static Block block = null;
 	private int topLine;
 	private int fullLine;
+	public boolean gameover = false;
 	
 	public Board() {
 		for (int i = 0; i < boardH; i++) {					// 보드 초기화
@@ -29,6 +30,8 @@ public class Board{
 		return board;
 	}
 
+	// 블록 생성, 보드에 추가
+	
 	public void makeBlock() { 								// 블록 생성
 		int blockNum = (int) (Math.random() * 7);
 		int[][] location = new int[4][2];
@@ -68,26 +71,24 @@ public class Board{
 	public void addBlock(int[][] location, Color color) { 	// 보드에 블록 추가	, 나중에 트라이 캐치 써서 블록 넣을 자리 없는지 확인
 		int[][] XY = new int[4][2];
 		
-		for (int i = boardH - 1; i >= 0; i--) {			
-			if(isFull(board[i])){
-				fullLine = i;
-				delLine(fullLine);
-				downLine(fullLine);
-				topLine++;
-			}
-		}
+		fullLine();
 		
 		for (int i = 0; i < location.length; i++) {
 			XY[i][0] = -1*location[i][1];					// y축
 			XY[i][1] = ((location[i][0]) + (boardW / 2));	// x축
 		}
+		
 		for (int i = 0; i < XY.length; i++) {
+			if(board[XY[i][0]][XY[i][1]] == initBoard){
 			board[XY[i][0]][XY[i][1]] = color;
 			currentBlockLocation[i][0] = XY[i][0];
 			currentBlockLocation[i][1] = XY[i][1];
+			}
+			else{
+				gameover = true;
+				break;
+			}
 		}
-		
-		
 	}
 	
 	public void addBlock(int[][] location){
@@ -102,6 +103,8 @@ public class Board{
 		}
 	}
 
+	// 블록 이동, 회전 관련
+	
 	public void moveBlock(int KeyCode) {		
 		boolean[] moveOk = new boolean[4];
 		setCurrentBlockColor(this.board[currentBlockLocation[0][0]][currentBlockLocation[0][1]]);
@@ -110,8 +113,8 @@ public class Board{
 			switch (KeyCode) {
 			case KeyEvent.VK_DOWN:												// 아래 방향키
 				currentBlockInit();
-				moveOk = checkBlockDown();
-				BlockDown(moveOk);
+				moveOk = checkBlockDown(board);
+				BlockDown(board, moveOk);
 				top();
 				break;
 				
@@ -139,7 +142,12 @@ public class Board{
 				break;
 				
 			case KeyEvent.VK_SPACE:
-
+				while(getTouchFloor() == false){
+					currentBlockInit();
+					moveOk = checkBlockDown(board);
+					BlockDown(board, moveOk);
+				}
+				top();
 				break;
 				
 			default:
@@ -182,13 +190,13 @@ public class Board{
 		return true;
 	}
 	
-	public boolean[] checkBlockDown(){
+	public boolean[] checkBlockDown(Color[][] board){
 		boolean[] moveOk = new boolean[4];
 		for (int i = 0; i < currentBlockLocation.length; i++) {													// 아래 칸으로 이동 가능한지 확인
 				
-			if (this.board[currentBlockLocation[i][0] + 1][currentBlockLocation[i][1]] == initBoard) {
+			if (board[currentBlockLocation[i][0] + 1][currentBlockLocation[i][1]] == initBoard) {
 				moveOk[i] = true;
-			} else {
+			} else {																				// 다른 색 블록이 있을 경우
 				moveOk[i] = false;
 				setTouchFloor(true);
 			}
@@ -196,7 +204,7 @@ public class Board{
 		return moveOk;
 	}
 	
-	public void BlockDown(boolean[] moveOk){
+	public void BlockDown(Color[][] board, boolean[] moveOk){
 		if (isFalse(moveOk)) {																					// 블록 이동 가능시 이동, 불가능시 복원
 			for (int i = 0; i < currentBlockLocation.length; i++) {
 				currentBlockLocation[i][0]++;
@@ -206,26 +214,17 @@ public class Board{
 					//setCurrentBlockColor(Color.WHITE);
 				}
 				
-				this.board[currentBlockLocation[i][0]][currentBlockLocation[i][1]] = getCurrentBlockColor();
+				board[currentBlockLocation[i][0]][currentBlockLocation[i][1]] = getCurrentBlockColor();
 			}
 		} else
 
 		{
 			for (int i = 0; i < currentBlockLocation.length; i++) {
-				this.board[currentBlockLocation[i][0]][currentBlockLocation[i][1]] = getCurrentBlockColor();
+				board[currentBlockLocation[i][0]][currentBlockLocation[i][1]] = getCurrentBlockColor();
 			}
 		}
 	}
 	
-	public boolean isFalse(boolean[] ck) {
-		for (int i = 0; i < ck.length; i++) {
-			if (ck[i] == false) {
-				return false;
-			}
-		}
-		return true;
-	}
-
 	public boolean[] checkBlockLeft(){
 		boolean[] moveOk = new boolean[4];
 		for (int i = 0; i < currentBlockLocation.length; i++) {													// 왼쪽 칸으로 이동 가능한지 확인
@@ -278,6 +277,8 @@ public class Board{
 		}
 	}
 	
+	// 게임 시스템 관련 메소드
+	
 	public static Color getCurrentBlockColor() {
 		return currentBlockColor;
 	}
@@ -294,22 +295,29 @@ public class Board{
 		Board.touchFloor = touchFloor;
 	}
 	
-	public void top(){
-		for (int i = boardH - 1; i >= 0; i--) {
+	public boolean isFalse(boolean[] ck) {						// 배열 안에 false 가 있으면 false 리턴하는 메소드
+		for (int i = 0; i < ck.length; i++) {
+			if (ck[i] == false) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public void top(){											// 쌓인 블록의 가장 위를 찾는다
+		for (int i = boardH - 1; i > 0; i--) {
 			if(isBlock(board[i])){
 				topLine = boardH - i;
 			}
 			
 			if(isFull(board[i])){
 				fullLine = i;
-				delLine(fullLine);
-				downLine(fullLine);
 				topLine--;
 			}
 		}
 	}
 	
-	public boolean isBlock(Color[] line){
+	public boolean isBlock(Color[] line){						// 한 줄에 블록이 있는지 검사한다.
 		for (int i = 0; i < line.length; i++) {
 			if (line[i] != initBoard) {
 				return true;
@@ -318,7 +326,7 @@ public class Board{
 		return false;
 	}
 
-	public boolean isFull(Color[]line){
+	public boolean isFull(Color[]line){							// 한 줄이 블록으로 가득 차있는지 검사한다.
 		for (int i = 0; i < line.length; i++) {
 			if (line[i] == initBoard) {
 				return false;
@@ -327,15 +335,28 @@ public class Board{
 		return true;
 	}
 	
-	public void delLine(int num){
-		for(int i = 0; i<boardW ; i++){
+	public void delLine(int num){								// 한줄을 삭제한다.
+		for(int i = 0; i < boardW ; i++){
 			board[num][i] = initBoard;
 		}
 	}
 	
-	public void downLine(int num){
-		for(int i = num - 1; i >= topLine ; i--){
-			board[i + 1] = board[i]; 
+	public void downLine(int num){								// topLine 밑으로 한줄 씩 내린다.
+		for(int i = num; i >= boardH - topLine ; i--){
+			board[i] = board[i-1].clone(); 
 		}
 	}
+
+	public void fullLine(){										// 꽉 찬 라인을 대상으로 작동한다.
+		for (int i = boardH - 1; i >= 0; i--) {			
+			if(isFull(board[i])){
+				fullLine = i;
+				delLine(fullLine);
+				downLine(fullLine);
+				topLine++;
+			}
+		}
+	}
+	
+	
 }
