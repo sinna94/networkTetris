@@ -7,17 +7,18 @@ import java.awt.event.KeyListener;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
-public class window extends JFrame implements KeyListener{
+public class TetrisGame extends JFrame implements KeyListener{
 
 	private JPanel contentPane;
 	public static Board board = new Board();
 
-	public window() {
+	public TetrisGame() {
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 547, 577);
@@ -54,16 +55,16 @@ public class window extends JFrame implements KeyListener{
 		contentPane.add(otherPanel);
 		
 		
-		Thread t = new Thread(new DownThread());
-	//	t.start();
+		Thread t = new Thread(new DownThread());					// 시간이 지날때 마다 한 칸씩 블록이 내려오는 쓰레드
+		t.start();
 		
-		window.board.makeBlock();
+		TetrisGame.board.makeBlock();
 	}
 
 	@Override
-	public void keyPressed(KeyEvent e) {
+	public void keyPressed(KeyEvent e) {		
 		int KeyCode = e.getKeyCode();
-		window.board.moveBlock(KeyCode);
+		TetrisGame.board.moveBlock(KeyCode);
 		repaint();
 	}
 
@@ -78,28 +79,14 @@ public class window extends JFrame implements KeyListener{
 		// TODO Auto-generated method stub
 
 	}
-	
-	
-	
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					window frame = new window();
-					frame.setVisible(true);
-				} catch (Exception e) {	}
-			}
-		});
-	}
 
 	private class DownThread implements Runnable {
 		@Override
 		public void run() {
 			try {
 				while (true) {
-					System.out.println("쓰레드~~");
-					Thread.sleep(2000);
-					window.board.moveBlock(KeyEvent.VK_DOWN);
+					Thread.sleep(1000);
+					TetrisGame.board.moveBlock(KeyEvent.VK_DOWN);
 					repaint();
 				}
 			} catch (InterruptedException e) {		}
@@ -107,10 +94,6 @@ public class window extends JFrame implements KeyListener{
 		}
 	}
 }
-
-
-
-
 
 class gamePanel extends JPanel {
 	public gamePanel() {
@@ -122,27 +105,38 @@ class gamePanel extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponents(g);
 
-		
-		if (Board.getTouchFloor()) {			// 블록이 내려갈 수 없을 때 새로운 블록을 만듬
-			window.board.makeBlock();
-			Board.setTouchFloor(false);
-		}
-		
 		int boardX = getX();
 		int boardY = getY();
 		int boardW = getWidth();
 		int boardH = getHeight();
 		int blockW = (boardW - boardX) / 10;
 		int blockH = (boardH - boardY) / 20;
-
-		for (int i = 0; i < window.board.boardH; i++) {
-			for (int j = 0; j < window.board.boardW; j++) {
-				g.setColor(window.board.getBoard()[i][j]);
-				g.fill3DRect(boardX + j * blockW, boardY + i * blockH, blockW, blockH, false);
-
-			}
+		
+		if (Board.getTouchFloor()) {			// 블록이 내려갈 수 없을 때 새로운 블록을 만듬
+			TetrisGame.board.makeBlock();
+			Board.setTouchFloor(false);
+			
 		}
 		
+		if(TetrisGame.board.gameover){
+			for (int i = 0; i < TetrisGame.board.boardH; i++) {
+				for (int j = 0; j < TetrisGame.board.boardW; j++) {
+					g.setColor(Color.BLACK);
+					g.fill3DRect(boardX + j * blockW, boardY + i * blockH, blockW, blockH, false);
+				}
+			}
+			JOptionPane.showMessageDialog(null, "GameOver");
+		}
+		
+		else {
+			for (int i = 0; i < TetrisGame.board.boardH; i++) {
+				for (int j = 0; j < TetrisGame.board.boardW; j++) {
+					g.setColor(TetrisGame.board.getBoard()[i][j]);
+					g.fill3DRect(boardX + j * blockW, boardY + i * blockH, blockW, blockH, false);
+
+				}
+			}
+		}
 		
 	}
 }

@@ -68,7 +68,7 @@ public class Board{
 		block.rotation();								// 처음 회전 씹히는 것 때문에 넣음
 	}
 
-	public void addBlock(int[][] location, Color color) { 	// 보드에 블록 추가	, 나중에 트라이 캐치 써서 블록 넣을 자리 없는지 확인
+	public void addBlock(int[][] location, Color color) { 	// 보드에 블록 추가
 		int[][] XY = new int[4][2];
 		
 		fullLine();
@@ -348,12 +348,13 @@ public class Board{
 	}
 
 	public void fullLine(){										// 꽉 찬 라인을 대상으로 작동한다.
-		for (int i = boardH - 1; i >= 0; i--) {			
+		for (int i = 0; i <= boardH - 1; i++) {		
 			if(isFull(board[i])){
 				fullLine = i;
 				delLine(fullLine);
 				downLine(fullLine);
 				topLine++;
+				System.out.println("제거");
 			}
 		}
 	}
