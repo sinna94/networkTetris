@@ -1,6 +1,7 @@
 package Server;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,11 +17,9 @@ public class Server {
 		
 		try{
 			while(true){
-				Game Game1 = new Game();
-				Game Game2 = new Game();
 				
-				Player player1 = new Player(Game1, Game2, ss.accept());
-				Player player2 = new Player(Game2, Game1, ss.accept());
+				Player player1 = new Player(ss.accept());
+				Player player2 = new Player(ss.accept());
 				
 				player1.setOther(player2);
 				player2.setOther(player1);
@@ -36,22 +35,14 @@ public class Server {
 	}
 }
 
-class Game{
-	Color[][] board = new Color[20][10];
-	
-}
-
 class Player extends Thread{
-	Game game1;
-	Game game2;
 	Socket socket;
 	BufferedReader input;
 	PrintWriter output;
 	Player other;
 	
-	public Player(Game game1, Game game2, Socket socket){
-		this.game1 = game1;
-		this.game2 = game2;
+	public Player(Socket socket){
+		
 		this.socket = socket;
 		
 		try{
@@ -74,14 +65,19 @@ class Player extends Thread{
 			output.println("모든 경기자가 연결되었습니다.");
 			output.println("START");
 			while(true){
-				String command = input.readLine();
+				Object command = input.readLine();
 				if(command == null){
 					continue;
 				}
-				if(command.startsWith("Move")){
-					
+				
+				if(((String) command).startsWith("MOVE")){					// 클라이언트에서 키보드를 누를 때 다른 클라이언트로 전송
+					System.out.println("전송");
+					command = input.readLine();
+					other.output.println("OTHER");
+					other.output.println(command);
 				}
-				else if(command.startsWith("QUIT")){
+				
+				else if(((String) command).startsWith("QUIT")){
 					return ;
 				}
 			}

@@ -1,4 +1,5 @@
 import java.awt.EventQueue;
+import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,6 +12,9 @@ public class TetrisClient extends Thread {
 	private Socket socket;
 	private BufferedReader input;
 	private PrintWriter output;
+	private TetrisGame game;
+	private LoadingUi loading;
+	private boolean start = true;
 	
 	public TetrisClient() throws UnknownHostException, IOException{
 		
@@ -19,36 +23,59 @@ public class TetrisClient extends Thread {
 		input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		output = new PrintWriter(socket.getOutputStream(), true);
 		
-		
 	}
 	
 	public void run(){
-		String response;
+		Object response;
 		
 		try{
 			response = input.readLine();
 			
-			if(response.startsWith("LOADING")){
+			if(((String) response).startsWith("LOADING")){
 				System.out.println("로딩중");
-				LoadingUi loading = new LoadingUi();
+				loading = new LoadingUi();
 				loading.setVisible(true);
 			}
 			
-			while(true){
+			while(start){
 				response = input.readLine();
 				
-				if(response.startsWith("START")){
-					TetrisGame game = new TetrisGame();
+				if(((String) response).startsWith("START")){
+					game = new TetrisGame();
 					game.setVisible(true);
-				}
-				
-				if(response.startsWith("OTHER")){
+					loading.dispose();
+					start = false;
 					
+					output.println("MOVE");
+					output.println(game.getBoardImage()); 
+					
+					break;
+				}
+			}
+			
+			while(true){
+				
+				response = input.readLine();
+				
+				if(game.isMoveBlock() == true){						// 블록이 움직였을 경우 내 보드 이미지를 서버로 전송
+					System.out.println("무브");
+					output.println("MOVE");
+					output.println(game.getBoardImage());
+					game.setMoveBlock(false);
 				}
 				
+				if(((String) response).startsWith("OTHER")){		// 상대방 보드 이미지가 서버에서 전송됨
+					System.out.println("상대방");
+					response = input.readLine();
+					game.setOtherPlay((Image) response);
+				}
+				System.out.println("루프3");
 				try{
+					System.out.println("루프4");
 					Thread.sleep(200);
 				} catch (InterruptedException e){
+					System.out.println("루프5");
+					System.out.println("에러 " + e);
 					e.printStackTrace();
 				}
 			}

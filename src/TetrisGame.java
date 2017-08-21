@@ -1,7 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -17,7 +17,10 @@ public class TetrisGame extends JFrame implements KeyListener{
 
 	private JPanel contentPane;
 	public static Board board = new Board();
-
+	private boolean moveBlock = false;
+	private Graphics boardImage;
+	private Image otherPlay = null;
+	
 	public TetrisGame() {
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -27,6 +30,7 @@ public class TetrisGame extends JFrame implements KeyListener{
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		
 		gamePanel gamePanel = new gamePanel();
 		contentPane.add(gamePanel);
 
@@ -60,11 +64,13 @@ public class TetrisGame extends JFrame implements KeyListener{
 		
 		TetrisGame.board.makeBlock();
 	}
-
+	
 	@Override
 	public void keyPressed(KeyEvent e) {		
 		int KeyCode = e.getKeyCode();
 		TetrisGame.board.moveBlock(KeyCode);
+		setMoveBlock(true);
+		
 		repaint();
 	}
 
@@ -80,6 +86,50 @@ public class TetrisGame extends JFrame implements KeyListener{
 
 	}
 
+	public boolean isMoveBlock() {
+		return moveBlock;
+	}
+
+	public void setMoveBlock(boolean moveBlock) {
+		this.moveBlock = moveBlock;
+	}
+
+	
+	public Image getOtherPlay() {
+		return otherPlay;
+	}
+
+	public void setOtherPlay(Image otherPlay) {
+		this.otherPlay = otherPlay;
+	}
+	
+	public Graphics getBoardImage() {
+		return boardImage;
+	}
+
+	public void setBoardImage(Graphics boardImage) {
+		this.boardImage = boardImage;
+	}
+
+	private int[] otherPanelSize(){
+		int[] size = {298, 276, 221, 252};
+		
+		return size;
+	}
+	
+	public void paintComponent(Graphics g) {
+		super.paintComponents(g);
+		
+		int[] otherPanelSize = otherPanelSize();
+		
+		if(getOtherPlay() != null){
+			g.drawImage(otherPlay, otherPanelSize[0], otherPanelSize[1], otherPanelSize[2], otherPanelSize[3], this);
+			setBoardImage(null);
+		}
+		
+		
+	}
+	
 	private class DownThread implements Runnable {
 		@Override
 		public void run() {
@@ -87,56 +137,57 @@ public class TetrisGame extends JFrame implements KeyListener{
 				while (true) {
 					Thread.sleep(1000);
 					TetrisGame.board.moveBlock(KeyEvent.VK_DOWN);
+					setMoveBlock(true);
 					repaint();
 				}
 			} catch (InterruptedException e) {		}
 
 		}
 	}
-}
+	
+	class gamePanel extends JPanel {
+		public gamePanel() {
 
-class gamePanel extends JPanel {
-	public gamePanel() {
-		
-		this.setBackground(Color.GRAY);
-		this.setBounds(12, 10, 274, 518);
-	}
+			this.setBackground(Color.GRAY);
+			this.setBounds(12, 10, 274, 518);
+		}
 
-	public void paintComponent(Graphics g) {
-		super.paintComponents(g);
+		public void paintComponent(Graphics g) {
+			super.paintComponents(g);
 
-		int boardX = getX();
-		int boardY = getY();
-		int boardW = getWidth();
-		int boardH = getHeight();
-		int blockW = (boardW - boardX) / 10;
-		int blockH = (boardH - boardY) / 20;
-		
-		if (Board.getTouchFloor()) {			// 블록이 내려갈 수 없을 때 새로운 블록을 만듬
-			TetrisGame.board.makeBlock();
-			Board.setTouchFloor(false);
+			int boardX = getX();
+			int boardY = getY();
+			int boardW = getWidth();
+			int boardH = getHeight();
+			int blockW = (boardW - boardX) / 10;
+			int blockH = (boardH - boardY) / 20;
 			
-		}
-		
-		if(TetrisGame.board.gameover){
-			for (int i = 0; i < TetrisGame.board.boardH; i++) {
-				for (int j = 0; j < TetrisGame.board.boardW; j++) {
-					g.setColor(Color.BLACK);
-					g.fill3DRect(boardX + j * blockW, boardY + i * blockH, blockW, blockH, false);
-				}
-			}
-			JOptionPane.showMessageDialog(null, "GameOver");
-		}
-		
-		else {
-			for (int i = 0; i < TetrisGame.board.boardH; i++) {
-				for (int j = 0; j < TetrisGame.board.boardW; j++) {
-					g.setColor(TetrisGame.board.getBoard()[i][j]);
-					g.fill3DRect(boardX + j * blockW, boardY + i * blockH, blockW, blockH, false);
+			if (Board.getTouchFloor()) { // 블록이 내려갈 수 없을 때 새로운 블록을 만듬
+				TetrisGame.board.makeBlock();
+				Board.setTouchFloor(false);
 
+			}
+
+			if (TetrisGame.board.gameover) {
+				for (int i = 0; i < TetrisGame.board.boardH; i++) {
+					for (int j = 0; j < TetrisGame.board.boardW; j++) {
+						g.setColor(Color.BLACK);
+						g.fill3DRect(boardX + j * blockW, boardY + i * blockH, blockW, blockH, false);
+					}
+				}
+				JOptionPane.showMessageDialog(null, "GameOver");
+			}
+
+			else {
+				for (int i = 0; i < TetrisGame.board.boardH; i++) {
+					for (int j = 0; j < TetrisGame.board.boardW; j++) {
+						g.setColor(TetrisGame.board.getBoard()[i][j]);
+						g.fill3DRect(boardX + j * blockW, boardY + i * blockH, blockW, blockH, false);
+					}
 				}
 			}
+			
+			setBoardImage(g);
 		}
-		
 	}
 }
