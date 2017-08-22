@@ -1,6 +1,7 @@
 import java.awt.Color;
+import java.io.Serializable;
 
-public abstract class Block implements Cloneable{
+public abstract class Block implements Cloneable, Serializable{
 	/*
 	 * private int O_block = 1; private int I_block = 2; private int S_block =
 	 * 3; private int Z_block = 4; private int L_block = 5; private int J_block

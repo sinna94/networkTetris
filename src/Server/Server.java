@@ -2,15 +2,18 @@ package Server;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
-	
+		
 	public static void main(String[] args) throws Exception{
 		ServerSocket ss = new ServerSocket(9001);
 		System.out.println("서버 시작");
@@ -30,6 +33,7 @@ public class Server {
 				System.out.println("두명이 접속함");
 			}
 		} finally{
+			
 			ss.close();
 		}
 	}
@@ -39,6 +43,10 @@ class Player extends Thread{
 	Socket socket;
 	BufferedReader input;
 	PrintWriter output;
+	
+	ObjectInputStream ois;
+	ObjectOutputStream oos;
+	
 	Player other;
 	
 	public Player(Socket socket){
@@ -48,6 +56,9 @@ class Player extends Thread{
 		try{
 			input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			output = new PrintWriter(socket.getOutputStream(), true);
+			
+			ois = new ObjectInputStream(socket.getInputStream());
+			oos = new ObjectOutputStream(socket.getOutputStream());
 			
 			output.println("LOADING");
 			
@@ -65,19 +76,26 @@ class Player extends Thread{
 			output.println("모든 경기자가 연결되었습니다.");
 			output.println("START");
 			while(true){
-				Object command = input.readLine();
+				String command = input.readLine();
+							
 				if(command == null){
 					continue;
 				}
 				
-				if(((String) command).startsWith("MOVE")){					// 클라이언트에서 키보드를 누를 때 다른 클라이언트로 전송
-					System.out.println("전송");
-					command = input.readLine();
-					other.output.println("OTHER");
+				if(command.startsWith("BLOCK")){
+					other.output.println("BLOCK");
 					other.output.println(command);
 				}
 				
-				else if(((String) command).startsWith("QUIT")){
+				if(command.startsWith("MOVE")){					// 클라이언트에서 키보드를 누를 때 다른 클라이언트로 전송
+					System.out.println("전송");
+					
+					other.output.println("OTHER");
+					
+					System.out.println("전송 완료");
+				}
+				
+				else if(command.startsWith("QUIT")){
 					return ;
 				}
 			}
@@ -85,6 +103,7 @@ class Player extends Thread{
 			System.out.println("연결이 끊어졌습니다.2");
 		} finally{
 			try{
+				stop();
 				socket.close();
 			} catch (IOException e){
 			}

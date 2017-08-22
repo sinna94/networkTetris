@@ -8,12 +8,12 @@ public class Board{
 	final int boardH = 20;
 
 	private Color[][] board = new Color[boardH][boardW];
-	private static int[][] currentBlockLocation = new int[4][2];
-	private static Color currentBlockColor = null;
-	private static Block currentBlock;
+	private int[][] currentBlockLocation = new int[4][2];
+	private Color currentBlockColor = null;
+	private Block currentBlock;
 	private Color initBoard = Color.GRAY;
-	private static boolean touchFloor = false;
-	private static Block block = null;
+	private boolean touchFloor = false;
+	private  Block block = null;
 	private int topLine;
 	private int fullLine;
 	public boolean gameover = false;
@@ -34,6 +34,41 @@ public class Board{
 	
 	public void makeBlock() { 								// 블록 생성
 		int blockNum = (int) (Math.random() * 7);
+		int[][] location = new int[4][2];
+
+		switch (blockNum) {
+		case 0:
+			block = new O_Block();
+			break;
+		case 1:
+			block = new I_Block();
+			break;
+		case 2:
+			block = new S_Block();
+			break;
+		case 3:
+			block = new Z_Block();
+			break;
+		case 4:
+			block = new L_Block();
+			break;
+		case 5:
+			block = new J_Block();
+			break;
+		case 6:
+			block = new T_Block();
+			break;
+		default:
+			break;
+		}
+		
+		location = block.getBlock();
+		setCurrentBlockColor(block.getColor());
+		addBlock(location, getCurrentBlockColor());
+		block.rotation();								// 처음 회전 씹히는 것 때문에 넣음
+	}
+	
+	public void makeBlock(int blockNum){
 		int[][] location = new int[4][2];
 
 		switch (blockNum) {
@@ -279,20 +314,24 @@ public class Board{
 	
 	// 게임 시스템 관련 메소드
 	
-	public static Color getCurrentBlockColor() {
+	public Block getCurrentBlock() {
+		return currentBlock;
+	}
+	
+	public Color getCurrentBlockColor() {
 		return currentBlockColor;
 	}
 
-	public static void setCurrentBlockColor(Color currentBlockColor) {
-		Board.currentBlockColor = currentBlockColor;
+	public void setCurrentBlockColor(Color currentBlockColor) {
+		this.currentBlockColor = currentBlockColor;
 	}
 
-	public static boolean getTouchFloor() {
-		return touchFloor;
+	public boolean getTouchFloor() {
+		return isTouchFloor();
 	}
 
-	public static void setTouchFloor(boolean touchFloor) {
-		Board.touchFloor = touchFloor;
+	public void setTouchFloor(boolean touchFloor) {
+		this.touchFloor = touchFloor;
 	}
 	
 	public boolean isFalse(boolean[] ck) {						// 배열 안에 false 가 있으면 false 리턴하는 메소드
@@ -357,6 +396,10 @@ public class Board{
 				System.out.println("제거");
 			}
 		}
+	}
+
+	public boolean isTouchFloor() {
+		return touchFloor;
 	}
 	
 	
