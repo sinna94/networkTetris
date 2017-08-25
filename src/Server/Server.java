@@ -17,7 +17,6 @@ public class Server {
 	public static void main(String[] args) throws Exception{
 		ServerSocket ss = new ServerSocket(9001);
 		System.out.println("서버 시작");
-		
 		try{
 			while(true){
 				
@@ -72,27 +71,33 @@ class Player extends Thread{
 	}
 	
 	public void run(){
+		String command;
 		try{
 			output.println("모든 경기자가 연결되었습니다.");
-			output.println("START");
+			output.println("READY");
+			int blockNum = (int) (Math.random() * 7);
+			output.println("GO");						// 처음 시작 블록 전송
+		//	output.println(""+blockNum);
+		//	other.output.println(""+blockNum);
+			
 			while(true){
-				String command = input.readLine();
+				command = input.readLine();
 							
 				if(command == null){
 					continue;
 				}
-				
-				if(command.startsWith("BLOCK")){
-					other.output.println("BLOCK");
-					other.output.println(command);
+
+				if (command.startsWith("NEW")) {				//클라이언트에서 새로 생긴 블록 번호
+					String Num = input.readLine();
+					other.output.println("NEW,"+Num);
+					//other.output.println(Num);
+					
 				}
-				
+
 				if(command.startsWith("MOVE")){					// 클라이언트에서 키보드를 누를 때 다른 클라이언트로 전송
-					System.out.println("전송");
-					
-					other.output.println("OTHER");
-					
-					System.out.println("전송 완료");
+					String KeyCode = input.readLine();					
+					other.output.println("OTHER,"+KeyCode);
+				//	other.output.println(KeyCode);
 				}
 				
 				else if(command.startsWith("QUIT")){

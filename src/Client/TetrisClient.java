@@ -1,3 +1,4 @@
+package Client;
 import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,7 +13,7 @@ public class TetrisClient extends Thread {
 
 	private Socket socket;
 	private BufferedReader input;
-	private PrintWriter output;
+	private static PrintWriter output;
 	
 	private ObjectInputStream ois;
 	private ObjectOutputStream oos;
@@ -23,7 +24,7 @@ public class TetrisClient extends Thread {
 	
 	public TetrisClient() throws UnknownHostException, IOException{
 		
-		socket = new Socket("localhost", 9001);
+		socket = new Socket("122.40.66.211", 9001);
 		
 		input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		output = new PrintWriter(socket.getOutputStream(), true);
@@ -48,47 +49,47 @@ public class TetrisClient extends Thread {
 			while(start){
 				response = input.readLine();
 				
-				if(response.startsWith("START")){			// 게임 시작
+				if(response.startsWith("READY")){			// 게임 준비
 					game = new TetrisGame();
 					game.setVisible(true);
 					loading.dispose();
-					start = false;				
+				}
+				
+				if(response.startsWith("GO")){				// 게임 시작
+					game.makeNewBlock();
+					//int blockNum = (int) (Math.random() * 7);
+					//int blockNum = Integer.valueOf(response.split(",")[1]);
+					//game.board.makeBlock(blockNum);
+					//game.other.makeBlock(blockNum);
+					//game.board.makeBlock(Integer.valueOf(input.readLine()));
+					//game.other.makeBlock(Integer.valueOf(input.readLine()));
 					
-					output.println("BLOCK");				// 현재 블록 전송
-					oos.writeObject(TetrisGame.board.getCurrentBlock());
+					Thread t = new Thread(game);					// 시간이 지날때 마다 한 칸씩 블록이 내려오는 쓰레드
+					t.start();
 					
+					start = false;	
 					break;
 				}
 			}
 			
 			while(true){
-				
 				response = input.readLine();
 				
-				if(response.startsWith("BLOCK")){					// 상대방 블록색 받음
-					Block otherBlock = (Block) ois.readObject();
-					TetrisGame.other.addBlock(otherBlock.getLocation(), otherBlock.getColor());
+				if(response.startsWith("OTHER")){				// 다른 클라이언트의 키 움직임
+					//int KeyCode = Integer.valueOf(input.readLine());
+					int KeyCode = Integer.valueOf(response.split(",")[1]);
+					game.otherBlockMove(KeyCode);
+				}
+									
+				if(response.startsWith("NEW")){
+					//int blockNum = Integer.valueOf(input.readLine());
+					int blockNum = Integer.valueOf(response.split(",")[1]);
+					game.other.makeBlock(blockNum);
 				}
 				
-				if(game.isMoveBlock() == true){						// 블록이 움직였을 경우 내 보드 이미지를 서버로 전송
-					System.out.println("무브");
-					output.println("MOVE");
-					
-					game.setMoveBlock(false);
-				}
-				
-				if(response.startsWith("OTHER")){		// 상대방 보드 이미지가 서버에서 전송됨
-					System.out.println("상대방");
-					
-				}
-				
-				
-				System.out.println("루프3");
 				try{
-					System.out.println("루프4");
-					Thread.sleep(200);
+					Thread.sleep(100);
 				} catch (InterruptedException e){
-					System.out.println("루프5");
 					System.out.println("에러 " + e);
 					e.printStackTrace();
 				}
@@ -98,9 +99,6 @@ public class TetrisClient extends Thread {
 			System.out.println("1에러 " + e);
 			e.printStackTrace();
 			
-		} catch (ClassNotFoundException e) {
-			System.out.println("에러 " + e);
-			e.printStackTrace();
 		} finally{
 			try{
 				socket.close();
@@ -108,6 +106,18 @@ public class TetrisClient extends Thread {
 				System.out.println("2에러 " + e);
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	public static class Key{
+		public static void moveBlock(int keyCode) { // 서버로 키 코드 전송
+			output.println("MOVE");
+			output.println(keyCode);
+		}
+
+		public static void newBlock(int blockNum) { // 서버로 블록 번호 전송
+			output.println("NEW");
+			output.println(blockNum);
 		}
 	}
 	

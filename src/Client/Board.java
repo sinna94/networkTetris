@@ -1,3 +1,4 @@
+package Client;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -68,7 +69,8 @@ public class Board{
 		block.rotation();								// 처음 회전 씹히는 것 때문에 넣음
 	}
 	
-	public void makeBlock(int blockNum){
+	public void makeBlock(int blockNum) { 								// 블록 생성
+	//	int blockNum = (int) (Math.random() * 7);
 		int[][] location = new int[4][2];
 
 		switch (blockNum) {
@@ -102,7 +104,7 @@ public class Board{
 		addBlock(location, getCurrentBlockColor());
 		block.rotation();								// 처음 회전 씹히는 것 때문에 넣음
 	}
-
+	
 	public void addBlock(int[][] location, Color color) { 	// 보드에 블록 추가
 		int[][] XY = new int[4][2];
 		
@@ -143,7 +145,6 @@ public class Board{
 	public void moveBlock(int KeyCode) {		
 		boolean[] moveOk = new boolean[4];
 		setCurrentBlockColor(this.board[currentBlockLocation[0][0]][currentBlockLocation[0][1]]);
-		
 		try {
 			switch (KeyCode) {
 			case KeyEvent.VK_DOWN:												// 아래 방향키
@@ -246,7 +247,6 @@ public class Board{
 				
 				if (currentBlockLocation[i][0] == boardH - 1) {													// 블록이 바닥에 닿았는지 확인
 					setTouchFloor(true);
-					//setCurrentBlockColor(Color.WHITE);
 				}
 				
 				board[currentBlockLocation[i][0]][currentBlockLocation[i][1]] = getCurrentBlockColor();
@@ -393,7 +393,6 @@ public class Board{
 				delLine(fullLine);
 				downLine(fullLine);
 				topLine++;
-				System.out.println("제거");
 			}
 		}
 	}
