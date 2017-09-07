@@ -100,7 +100,13 @@ class Player extends Thread{
 				//	other.output.println(KeyCode);
 				}
 				
-				else if(command.startsWith("QUIT")){
+				if(command.startsWith("DEL")){					// 클라이언트에서 라인을 부숨을 알림
+					int num = (int)(Math.random()*10);
+					output.println("OADD,"+num);
+					other.output.println("ADD,"+num);
+				}
+				
+				if(command.startsWith("QUIT")){
 					return ;
 				}
 			}

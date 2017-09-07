@@ -8,6 +8,8 @@ public class Board{
 	final int boardW = 10;
 	final int boardH = 20;
 
+	public boolean other;
+	
 	private Color[][] board = new Color[boardH][boardW];
 	private int[][] currentBlockLocation = new int[4][2];
 	private Color currentBlockColor = null;
@@ -19,12 +21,13 @@ public class Board{
 	private int fullLine;
 	public boolean gameover = false;
 	
-	public Board() {
+	public Board(boolean other) {
 		for (int i = 0; i < boardH; i++) {					// 보드 초기화
 			for (int j = 0; j < boardW; j++) {
 				board[i][j] = initBoard;
 			}
 		}
+		this.other = other;
 	}
 
 	public Color[][] getBoard() {
@@ -378,6 +381,8 @@ public class Board{
 		for(int i = 0; i < boardW ; i++){
 			board[num][i] = initBoard;
 		}
+		if(!other)
+			TetrisClient.Key.delLine();
 	}
 	
 	public void downLine(int num){								// topLine 밑으로 한줄 씩 내린다.
@@ -388,7 +393,7 @@ public class Board{
 
 	public void fullLine(){										// 꽉 찬 라인을 대상으로 작동한다.
 		for (int i = 0; i <= boardH - 1; i++) {		
-			if(isFull(board[i])){
+			if(isFull(board[i]) == true){
 				fullLine = i;
 				delLine(fullLine);
 				downLine(fullLine);
@@ -401,5 +406,26 @@ public class Board{
 		return touchFloor;
 	}
 	
+	public void upLine(){
+		currentBlockInit();
+		for(int i = boardH - topLine; i < boardH - 1  ; i++){
+			board[i] = board[i+1].clone(); 
+		}
+		
+		for(int i = 0;i <boardW;i++){
+			board[boardH-1][i] = initBoard;
+		}
+		addBlock(block.getLocation());
+		topLine++;
+	}
 	
+	public void makeLine(int num){
+		upLine();
+				
+		for(int i = 0;i <boardW;i++){
+			if(i != num){
+				board[boardH-1][i] = Color.DARK_GRAY;
+			}
+		}
+	}
 }

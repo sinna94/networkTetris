@@ -11,15 +11,21 @@ public abstract class Block implements Cloneable{
 
 	private int[][] location;
 	
-	public abstract int[][] getBlock();
+	public int[][] getBlock() {
+		return getLocation();
+	}
 
 	public abstract int[][] rotation();
 
 	public abstract Color getColor();
 	
-	public abstract int[][] getLocation();
-	
-	public abstract void setLocation(int[][] location);
+	public int[][] getLocation() {
+		return location;
+	}
+
+	public void setLocation(int[][] location) {
+		this.location = location;		
+	}
 	
 	public Object clone() {							// 블록 복사를 위해서
 		try {
@@ -32,267 +38,184 @@ public abstract class Block implements Cloneable{
 
 class O_Block extends Block {
 
-	private int[][] location = { { -1, 0 }, { -1, -1 }, { 0, 0 }, { 0, -1 } };
-	
-	@Override
-	public int[][] getBlock() {
-		return location;
+	public O_Block() {
+		int[][] location = { { -1, 0 }, { -1, -1 }, { 0, 0 }, { 0, -1 } };
+		setLocation(location);
 	}
-
 	@Override
 	public int[][] rotation() {
-		return location;
+		return getLocation();
 	}
 
 	@Override
 	public Color getColor() {
 		return Color.RED;
-	}
-
-	@Override
-	public int[][] getLocation() {
-		return location;
-	}
-
-	@Override
-	public void setLocation(int[][] location) {
-		this.location = location;		
-	}
+	}	
 }
 
 class I_Block extends Block {
 
-	private int[][] location = { { -2, 0 }, { -1, 0 }, { 0, 0 }, { 1, 0 } };
-
-	@Override
-	public int[][] getBlock() {
-		return location;
-	}
+	public I_Block() {
+		int[][] location = { { -2, 0 }, { -1, 0 }, { 0, 0 }, { 1, 0 } };
+		setLocation(location);
+		}
 
 	@Override
 	public int[][] rotation() {
 		int[][] rotateLocation = new int[4][2];
 
-		for (int i = 0; i < location.length; i++) {
-			rotateLocation[i][0] = location[i][1];
-			rotateLocation[i][1] = location[i][0];
+		for (int i = 0; i < getLocation().length; i++) {
+			rotateLocation[i][0] = getLocation()[i][1];
+			rotateLocation[i][1] = getLocation()[i][0];
 		}
-		location = rotateLocation;
-		return location;
+		setLocation(rotateLocation);
+		return getLocation();
 	}
 	
 	@Override
 	public Color getColor() {
 		return Color.YELLOW;
 	}
-	
-	@Override
-	public int[][] getLocation() {
-		return location;
-	}
-	
-	@Override
-	public void setLocation(int[][] location) {
-		this.location = location;		
-	}
 }
 
 class S_Block extends Block {
-	private int[][] location = { { -1, -1 }, { 0, -1 }, { 0, 0 }, { 1, 0 } };
+	
+	public S_Block(){
+		int[][] location = { { -1, -1 }, { 0, -1 }, { 0, 0 }, { 1, 0 } };
+		setLocation(location);
+	}
+	
 	private boolean ck = true;
 	
-	@Override
-	public int[][] getBlock() {
-		return location;
-	}
-
 	@Override
 	public int[][] rotation() {								// 처음엔 x 두번째는 y 에 바꾸고 -1 곱해야 함
 		int[][] rotateLocation = new int[4][2];
 
 		if (ck) {
-			for (int i = 0; i < location.length; i++) {
-				rotateLocation[i][0] = -location[i][1];
-				rotateLocation[i][1] = location[i][0];
+			for (int i = 0; i < getLocation().length; i++) {
+				rotateLocation[i][0] = -getLocation()[i][1];
+				rotateLocation[i][1] = getLocation()[i][0];
 				ck = false;
 			}
 		} else {
-			for (int i = 0; i < location.length; i++) {
-				rotateLocation[i][0] = location[i][1];
-				rotateLocation[i][1] = -location[i][0];
+			for (int i = 0; i < getLocation().length; i++) {
+				rotateLocation[i][0] = getLocation()[i][1];
+				rotateLocation[i][1] = -getLocation()[i][0];
 				ck = true;
 			}
 		}
-		location = rotateLocation;
-		return location;
+		setLocation(rotateLocation);
+		return getLocation();
 	}
 	
 	@Override
 	public Color getColor() {
 		return Color.GREEN;
 	}
-	
-	@Override
-	public int[][] getLocation() {
-		return location;
-	}
-	
-	@Override
-	public void setLocation(int[][] location) {
-		this.location = location;		
-	}
 }
 
 class Z_Block extends Block {
-	private int[][] location = { { -1, 0 }, { 0, -1 }, { 0, 0 }, { 1, -1 } };
+	public Z_Block(){
+		int[][] location = { { -1, 0 }, { 0, -1 }, { 0, 0 }, { 1, -1 } };
+		setLocation(location);
+	}
 	private boolean ck = true;
 	
-	@Override
-	public int[][] getBlock() {
-		return location;
-	}
-
 	@Override
 	public int[][] rotation() {
 		int[][] rotateLocation = new int[4][2];
 
 		if (ck) {
-			for (int i = 0; i < location.length; i++) {
-				rotateLocation[i][0] = -location[i][1];
-				rotateLocation[i][1] = location[i][0];
+			for (int i = 0; i < getLocation().length; i++) {
+				rotateLocation[i][0] = -getLocation()[i][1];
+				rotateLocation[i][1] = getLocation()[i][0];
 				ck = false;
 			}
 		} else {
-			for (int i = 0; i < location.length; i++) {
-				rotateLocation[i][0] = location[i][1];
-				rotateLocation[i][1] = -location[i][0];
+			for (int i = 0; i < getLocation().length; i++) {
+				rotateLocation[i][0] = getLocation()[i][1];
+				rotateLocation[i][1] = -getLocation()[i][0];
 				ck = true;
 			}
 		}
-		location = rotateLocation;
-		return location;
+		setLocation(rotateLocation);
+		return getLocation();
 	}
 	
 	@Override
 	public Color getColor() {
 		return Color.BLUE;
 	}
-	
-	@Override
-	public int[][] getLocation() {
-		return location;
-	}
-	
-	@Override
-	public void setLocation(int[][] location) {
-		this.location = location;		
-	}
 }
 
 class L_Block extends Block {
-	private int[][] location = { { -1, 0 }, { -1, -1 }, { 0, 0 }, { 1, 0 } };
-
-	@Override
-	public int[][] getBlock() {
-		return location;
+	public L_Block(){
+		int[][] location = { { -1, 0 }, { -1, -1 }, { 0, 0 }, { 1, 0 } };
+		setLocation(location);
 	}
 
 	@Override
 	public int[][] rotation() {
 		int[][] rotateLocation = new int[4][2];
 
-		for (int i = 0; i < location.length; i++) {
-			rotateLocation[i][0] = -location[i][1];
-			rotateLocation[i][1] = location[i][0];
+		for (int i = 0; i < getLocation().length; i++) {
+			rotateLocation[i][0] = -getLocation()[i][1];
+			rotateLocation[i][1] = getLocation()[i][0];
 		}
-		location = rotateLocation;
-		return location;
+		setLocation(rotateLocation);
+		return getLocation();
 	}
 	
 	@Override
 	public Color getColor() {
 		return Color.ORANGE;
 	}
-	
-	@Override
-	public int[][] getLocation() {
-		return location;
-	}
-	
-	@Override
-	public void setLocation(int[][] location) {
-		this.location = location;		
-	}
 }
 
 class J_Block extends Block {
-	private int[][] location = { { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, -1 } };
-
-	@Override
-	public int[][] getBlock() {
-		return location;
+	public J_Block(){
+		int[][] location = { { -1, 0 }, { 1, 0 }, { 0, 0 }, { 1, -1 } };
+		setLocation(location);
 	}
-
+	
 	@Override
 	public int[][] rotation() {
 		int[][] rotateLocation = new int[4][2];
 
-		for (int i = 0; i < location.length; i++) {
-			rotateLocation[i][0] = -location[i][1];
-			rotateLocation[i][1] = location[i][0];
+		for (int i = 0; i < getLocation().length; i++) {
+			rotateLocation[i][0] = -getLocation()[i][1];
+			rotateLocation[i][1] = getLocation()[i][0];
 		}
-		location = rotateLocation;
-		return location;
+		setLocation(rotateLocation);
+		return getLocation();
 	}
 	
 	@Override
 	public Color getColor() {
 		return Color.MAGENTA;
 	}
-	
-	@Override
-	public int[][] getLocation() {
-		return location;
-	}
-	
-	@Override
-	public void setLocation(int[][] location) {
-		this.location = location;		
-	}
 }
 
 class T_Block extends Block {
-	private int[][] location = { { -1, 0 }, { 0, -1 }, { 0, 0 }, { 1, 0 } };
-
-	@Override
-	public int[][] getBlock() {
-		return location;
+	public T_Block(){
+		int[][] location = { { -1, 0 }, { 0, -1 }, { 0, 0 }, { 1, 0 } };
+		setLocation(location);
 	}
-
+	
 	@Override
 	public int[][] rotation() {
 		int[][] rotateLocation = new int[4][2];
 
-		for (int i = 0; i < location.length; i++) {
-			rotateLocation[i][0] = -location[i][1];
-			rotateLocation[i][1] = location[i][0];
+		for (int i = 0; i < getLocation().length; i++) {
+			rotateLocation[i][0] = -getLocation()[i][1];
+			rotateLocation[i][1] = getLocation()[i][0];
 		}
-		location = rotateLocation;
-		return location;
+		setLocation(rotateLocation);
+		return getLocation();
 	}
 	
 	@Override
 	public Color getColor() {
 		return Color.WHITE;
-	}
-	
-	@Override
-	public int[][] getLocation() {
-		return location;
-	}
-	
-	@Override
-	public void setLocation(int[][] location) {
-		this.location = location;		
 	}
 }

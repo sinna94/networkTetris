@@ -17,8 +17,8 @@ import javax.swing.border.LineBorder;
 public class TetrisGame extends JFrame implements KeyListener, Runnable{
 
 	private JPanel contentPane;
-	public Board board = new Board();
-	public Board other = new Board();
+	public Board board = new Board(false);
+	public Board other = new Board(true);
 	private JPanel otherPanel;
 	private JPanel gamePanel;
 	
@@ -164,8 +164,6 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 			while (true) {
 				Thread.sleep(1000);
 				blockMove(KeyEvent.VK_DOWN);
-				// board.moveBlock(KeyEvent.VK_DOWN);
-				// other.moveBlock(KeyEvent.VK_DOWN);
 			}
 		} catch (InterruptedException e) {
 		}

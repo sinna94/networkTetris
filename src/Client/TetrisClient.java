@@ -24,7 +24,7 @@ public class TetrisClient extends Thread {
 	
 	public TetrisClient() throws UnknownHostException, IOException{
 		
-		socket = new Socket("122.40.66.211", 9001);
+		socket = new Socket("localhost", 9001);
 		
 		input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		output = new PrintWriter(socket.getOutputStream(), true);
@@ -57,12 +57,6 @@ public class TetrisClient extends Thread {
 				
 				if(response.startsWith("GO")){				// 게임 시작
 					game.makeNewBlock();
-					//int blockNum = (int) (Math.random() * 7);
-					//int blockNum = Integer.valueOf(response.split(",")[1]);
-					//game.board.makeBlock(blockNum);
-					//game.other.makeBlock(blockNum);
-					//game.board.makeBlock(Integer.valueOf(input.readLine()));
-					//game.other.makeBlock(Integer.valueOf(input.readLine()));
 					
 					Thread t = new Thread(game);					// 시간이 지날때 마다 한 칸씩 블록이 내려오는 쓰레드
 					t.start();
@@ -76,15 +70,23 @@ public class TetrisClient extends Thread {
 				response = input.readLine();
 				
 				if(response.startsWith("OTHER")){				// 다른 클라이언트의 키 움직임
-					//int KeyCode = Integer.valueOf(input.readLine());
 					int KeyCode = Integer.valueOf(response.split(",")[1]);
 					game.otherBlockMove(KeyCode);
 				}
 									
-				if(response.startsWith("NEW")){
-					//int blockNum = Integer.valueOf(input.readLine());
+				if(response.startsWith("NEW")){					// 다른 클라이언트 블록이 새로 생김
 					int blockNum = Integer.valueOf(response.split(",")[1]);
 					game.other.makeBlock(blockNum);
+				}
+				
+				if(response.startsWith("OADD")){
+					int num = Integer.valueOf(response.split(",")[1]);
+					game.other.makeLine(num);
+				}
+				
+				if(response.startsWith("ADD")){					// 다른 클라이언트에서 라인을 부숨
+					int num = Integer.valueOf(response.split(",")[1]);
+					game.board.makeLine(num);
 				}
 				
 				try{
@@ -119,6 +121,10 @@ public class TetrisClient extends Thread {
 			output.println("NEW");
 			output.println(blockNum);
 		}
+		public static void delLine(){
+			output.println("DEL");
+		}
+		
 	}
 	
 	public static void main(String[] args) {
