@@ -1,5 +1,4 @@
 package Client;
-import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -127,17 +126,6 @@ public class TetrisClient extends Thread {
 		
 	}
 	
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					TetrisClient client = new TetrisClient();
-					client.start();
-				} catch (Exception e) {	
-					System.out.println("C¿¡·¯ " + e);
-				}
-			}
-		});
-	}
+	
 
 }
