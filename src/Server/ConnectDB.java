@@ -13,7 +13,7 @@ public class ConnectDB {
 	}
 	
 	public Connection makeConnection(){
-		String url = "jdbc:mysql://localhost/student";
+		String url = "jdbc:mysql://localhost/tetris";
 		
 		String id = "root";
 		String password = "cnddl060708";

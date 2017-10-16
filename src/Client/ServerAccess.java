@@ -1,6 +1,8 @@
 package Client;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
@@ -12,7 +14,7 @@ public class ServerAccess {
 	public BufferedReader input;
 	public static PrintWriter output;
 	public ObjectOutputStream oos;
-	
+	public FileOutputStream fis;
 	
 	public ServerAccess() throws IOException{
 		socket = new Socket("localhost", 9001);

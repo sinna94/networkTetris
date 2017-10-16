@@ -17,8 +17,12 @@ public class Server {
 		
 		try{
 			while(true){
+				
 				Login login = new Login(ss.accept());
+				
+				System.out.println("¿¬°á");
 				login.run();
+				
 			}
 		} finally{
 			ss.close();
