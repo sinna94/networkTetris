@@ -1,8 +1,5 @@
 package Server;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,8 +12,19 @@ import java.net.Socket;
 public class Server {
 		
 	public static void main(String[] args) throws Exception{
-		ServerSocket ss = new ServerSocket(9001);
 		System.out.println("서버 시작");
+		ServerSocket ss = new ServerSocket(9001);
+		
+		try{
+			while(true){
+				Login login = new Login(ss.accept());
+				login.run();
+			}
+		} finally{
+			ss.close();
+		}
+		/*
+		
 		try{
 			while(true){
 				
@@ -35,7 +43,9 @@ public class Server {
 			
 			ss.close();
 		}
+		*/
 	}
+	
 }
 
 class Player extends Thread{
@@ -114,7 +124,6 @@ class Player extends Thread{
 			System.out.println("연결이 끊어졌습니다.2");
 		} finally{
 			try{
-				stop();
 				socket.close();
 			} catch (IOException e){
 			}

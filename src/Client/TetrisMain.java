@@ -1,9 +1,16 @@
 package Client;
 
+import java.io.IOException;
 
 public class TetrisMain {
 	public static void main(String[] args)  {
-		LobbyUI lobby = new LobbyUI();
-		lobby.setVisible(true);
+		LoginUI login;
+		try {
+			login = new LoginUI();
+			login.setVisible(true);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 }

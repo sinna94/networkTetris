@@ -1,43 +1,21 @@
 package Client;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.net.UnknownHostException;
 
 public class TetrisClient extends Thread {
-
-	private Socket socket;
-	private BufferedReader input;
-	private static PrintWriter output;
-	
-	private ObjectInputStream ois;
-	private ObjectOutputStream oos;
-	
 	private TetrisGame game;
 	private LoadingUi loading;
 	private boolean start = true;
+	private ServerAccess sv;
 	
-	public TetrisClient() throws UnknownHostException, IOException{
-		
-		socket = new Socket("localhost", 9001);
-		
-		input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		output = new PrintWriter(socket.getOutputStream(), true);
-	
-		oos = new ObjectOutputStream(socket.getOutputStream());
-		ois = new ObjectInputStream(socket.getInputStream());
-		
+	public TetrisClient() throws IOException {
+		sv = new ServerAccess();
 	}
 	
 	public void run(){
 		String response;
 		
 		try{
-			response = input.readLine();
+			response = sv.input.readLine();
 			
 			if(response.startsWith("LOADING")){
 				System.out.println("로딩중");
@@ -46,7 +24,7 @@ public class TetrisClient extends Thread {
 			}
 			
 			while(start){
-				response = input.readLine();
+				response = sv.input.readLine();
 				
 				if(response.startsWith("READY")){			// 게임 준비
 					game = new TetrisGame();
@@ -66,7 +44,7 @@ public class TetrisClient extends Thread {
 			}
 			
 			while(true){
-				response = input.readLine();
+				response = sv.input.readLine();
 				
 				if(response.startsWith("OTHER")){				// 다른 클라이언트의 키 움직임
 					int KeyCode = Integer.valueOf(response.split(",")[1]);
@@ -102,7 +80,7 @@ public class TetrisClient extends Thread {
 			
 		} finally{
 			try{
-				socket.close();
+				sv.socket.close();
 			} catch (IOException e){
 				System.out.println("2에러 " + e);
 				e.printStackTrace();
@@ -112,20 +90,16 @@ public class TetrisClient extends Thread {
 	
 	public static class Key{
 		public static void moveBlock(int keyCode) { // 서버로 키 코드 전송
-			output.println("MOVE");
-			output.println(keyCode);
+			ServerAccess.output.println("MOVE");
+			ServerAccess.output.println(keyCode);
 		}
 
 		public static void newBlock(int blockNum) { // 서버로 블록 번호 전송
-			output.println("NEW");
-			output.println(blockNum);
+			ServerAccess.output.println("NEW");
+			ServerAccess.output.println(blockNum);
 		}
 		public static void delLine(){
-			output.println("DEL");
+			ServerAccess.output.println("DEL");
 		}
-		
 	}
-	
-	
-
 }
