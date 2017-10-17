@@ -59,6 +59,8 @@ public class LobbyUI extends JFrame implements ActionListener {
 		btnExit = new JButton("Exit");
 		btnExit.addActionListener(this);
 		buttonPanel.add(btnExit);
+		
+		setVisible(true);
 	}
 
 	@Override

@@ -79,45 +79,37 @@ public class LoginUI extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == loginButton) {
 			login();
+
+			
+
 		}
-		/*
-		 * Account account = new Account(); 
-		 * account.setId(idField.getText());
-		 * account.setPw(passwordField.getText()); 
-		 * try {
-		 * sv.oos.writeObject((Account)account); 
-		 * sv.oos.flush(); } catch
-		 * (IOException e1) { e1.printStackTrace(); 
-		 * }
-		 */
-		else if (e.getSource() == cancelButton)		{
+
+		else if (e.getSource() == cancelButton) {
 			dispose();
-		} 
-		else if (e.getSource() == joinButton) {
+		} else if (e.getSource() == joinButton) {
 
 		}
 	}
 
 	private void login() {
-		ServerAccess.output.println("Login," + idField.getText() + "," + passwordField.getText());
-		System.out.println("전송완료");
+		Account account = new Account();
+		account.setId(idField.getText());
+		account.setPw(passwordField.getText());
 		try {
-			while (true) {
-				String correct = sv.input.readLine();
-				if (correct == null) {
-					continue;
-				}
-				System.out.println("송신완료");
-				if (correct.equals(true)) {
-					new LobbyUI();
-				} else {
-					JOptionPane.showMessageDialog(null, "틀림");
-				}
+			sv.oos.writeObject((Account) account);
+			sv.oos.flush();
+			String correct = sv.input.readLine();
+			System.out.println(correct + " 송신완료");
+			if (correct.equals("true")) {
+				new LobbyUI();
+				sv.socket.close();
+				this.dispose();
+			} else {
+				JOptionPane.showMessageDialog(null, "틀림");
 			}
-
 		} catch (IOException e1) {
 			e1.printStackTrace();
-
 		}
 	}
+	
 }
