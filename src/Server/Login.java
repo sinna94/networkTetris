@@ -1,8 +1,6 @@
 package Server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -47,6 +45,7 @@ public class Login implements Runnable{
 					output.println("false");
 				}
 			}
+			System.out.println("로그인 완료");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
@@ -56,6 +55,7 @@ public class Login implements Runnable{
 		} finally{
 			try {
 				socket.close();
+				return;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

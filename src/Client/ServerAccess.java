@@ -25,4 +25,8 @@ public class ServerAccess {
 		oos = new ObjectOutputStream(socket.getOutputStream());
 		bos = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 	}
+	
+	public Socket getSocket(){
+		return socket;
+	}
 }

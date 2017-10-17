@@ -1,25 +1,23 @@
 package Client;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JButton;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JTextPane;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
+import java.awt.Color;
 
 public class LobbyUI extends JFrame implements ActionListener {
 
 	private JPanel contentPane;
 	private JTextField textField;
+	private JTextArea chatArea;
 	private JButton btnGameStart;
 	private JButton btnExit;
 	
@@ -36,16 +34,21 @@ public class LobbyUI extends JFrame implements ActionListener {
 		contentPane.add(chatPanel);
 		chatPanel.setLayout(null);
 		
-		JTextArea textArea = new JTextArea();
-		textArea.setEditable(false);
-		textArea.setForeground(UIManager.getColor("Button.light"));
-		textArea.setBounds(0, 0, 603, 289);
-		chatPanel.add(textArea);
-		
 		textField = new JTextField();
 		textField.setBounds(0, 293, 603, 21);
 		chatPanel.add(textField);
 		textField.setColumns(10);
+		
+		chatArea = new JTextArea();
+		chatArea.setText("로그인 되었습니다.");
+		chatArea.setEditable(false);
+		chatArea.setForeground(Color.BLACK);
+		//chatArea.setBounds(0, 0, 603, 289);
+		
+		JScrollPane scrollPane = new JScrollPane(chatArea);
+		scrollPane.setLocation(0, 0);
+		scrollPane.setSize(603, 283);
+		chatPanel.add(scrollPane);
 		
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setBounds(12, 334, 603, 41);
@@ -63,6 +66,10 @@ public class LobbyUI extends JFrame implements ActionListener {
 		setVisible(true);
 	}
 
+	public void addString(String str){
+		chatArea.append(str);
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == btnGameStart){
@@ -70,6 +77,5 @@ public class LobbyUI extends JFrame implements ActionListener {
 		else if(e.getSource() == btnExit){
 			dispose();
 		}
-		
 	}
 }
