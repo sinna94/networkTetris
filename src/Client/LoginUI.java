@@ -23,8 +23,10 @@ public class LoginUI extends JFrame implements ActionListener {
 	private JButton cancelButton;
 	private JButton joinButton;
 	private ServerAccess sv;
-
-	public LoginUI() throws IOException {
+	
+	public LoginUI(ServerAccess sv) throws IOException {
+		this.sv = sv;
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 280, 175);
 		contentPane = new JPanel();
@@ -70,17 +72,27 @@ public class LoginUI extends JFrame implements ActionListener {
 		joinButton = new JButton("회원가입");
 		joinButton.addActionListener(this);
 		buttonPanel.add(joinButton);
-
-		sv = new ServerAccess();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == loginButton) {
-			login();
-
-			
-
+			sv.login(idField.getText(), passwordField.getText());
+			while (true) {
+				System.out.println(sv.isRecieve + " " + sv.loginOK);
+				if (sv.isRecieve){
+					if (sv.loginOK) {
+						new LobbyUI(sv);
+						this.dispose();
+					} else {
+						JOptionPane.showMessageDialog(null, "틀림");
+					}
+					break;
+				}
+				else{
+					continue;
+				}
+			}
 		}
 
 		else if (e.getSource() == cancelButton) {
@@ -90,24 +102,6 @@ public class LoginUI extends JFrame implements ActionListener {
 		}
 	}
 
-	private void login() {
-		Account account = new Account();
-		account.setId(idField.getText());
-		account.setPw(passwordField.getText());
-		try {
-			sv.oos.writeObject((Account) account);
-			sv.oos.flush();
-			String correct = sv.input.readLine();
-			if (correct.equals("true")) {
-				new LobbyUI();
-				sv.socket.close();
-				this.dispose();
-			} else {
-				JOptionPane.showMessageDialog(null, "틀림");
-			}
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-	}
+	
 	
 }

@@ -14,12 +14,11 @@ public class Server {
 		try{
 			while(true){
 				ServerThread t = new ServerThread(ss.accept(), sm);
-				vector.add(t);
+				sm.addVector(t);
 				System.out.println("¿¬°á");
 				t.start();
 			}
 		} finally{
-			ss.close();
 		}
 		/*
 		

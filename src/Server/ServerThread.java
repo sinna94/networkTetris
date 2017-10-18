@@ -19,6 +19,7 @@ public class ServerThread extends Thread{
 	private BufferedReader input;
 	private PrintWriter output;
 	private ObjectInputStream ois;
+	private String id;
 	
 	public ServerThread(Socket socket, ServerManager sm) throws IOException {
 		this.socket = socket;
@@ -29,28 +30,36 @@ public class ServerThread extends Thread{
 		db = new ConnectDB();
 	}
 
+	public Socket getSocket(){
+		return socket;
+	}
+	
+	public String getID(){
+		return id;
+	}
+	
 	public void receiveAccount() throws ClassNotFoundException, IOException, SQLException{
-		boolean c = true;
-		while (c) {
+		while (true) {
 			Account account = (Client.Account) ois.readObject();		// account  객체 클라이언트에서 전송 받음
 			
 			if(account == null){
 				continue;
 			}
-			
 			String id = account.getId();						// 디비에 있는 계정 정보와 맞는지 확인
 			String pw = account.getPw();
 			ResultSet rs = db.getQueryResult("SELECT id, pw FROM tetris.account WHERE id = '" + id + "' and pw = '" + pw + "';");
 
 			if(rs.next()){										// 맞으면 결과 값이 있으니까 true
-				output.println("true");
-				c = false;
+				System.out.println("로그인 성공");
+				this.id = id;
+				output.println("login,true");
+				break;
 			}
 			else{
-				output.println("false");
+				System.out.println("로그인 실패");
+				output.println("login,false");
 			}
 		}
-		System.out.println("로그인 완료");
 	}
 	
 	public void sendMessage(String str){
@@ -61,6 +70,7 @@ public class ServerThread extends Thread{
 	public void run() {		
 		try {
 			receiveAccount();
+			System.out.println("로그인 완료");
 			while(true){
 				String response = input.readLine();
 				
@@ -68,8 +78,11 @@ public class ServerThread extends Thread{
 					continue;
 				}
 				
+				System.out.println(response);
+				
 				if(response.startsWith("chat")){
-					sm.sendAll(response);
+					String chat = response.split(",")[1];
+					sm.sendAll("chat," + id + " : " + chat);
 				}
 			}
 		} catch (IOException e) {
@@ -78,7 +91,15 @@ public class ServerThread extends Thread{
 			e.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} 
+		} finally{
+			try {
+				sm.socketClose(socket);
+				socket.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 		
 	}

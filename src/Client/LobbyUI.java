@@ -3,6 +3,8 @@ package Client;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -13,15 +15,18 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 
-public class LobbyUI extends JFrame implements ActionListener {
+public class LobbyUI extends JFrame implements ActionListener, KeyListener {
 
 	private JPanel contentPane;
 	private JTextField textField;
 	private JTextArea chatArea;
 	private JButton btnGameStart;
 	private JButton btnExit;
-	
-	public LobbyUI() {
+	private ServerAccess sv;
+	public LobbyUI(ServerAccess sv) {
+		
+		this.sv = sv;
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 643, 424);
 		contentPane = new JPanel();
@@ -38,12 +43,14 @@ public class LobbyUI extends JFrame implements ActionListener {
 		textField.setBounds(0, 293, 603, 21);
 		chatPanel.add(textField);
 		textField.setColumns(10);
+		textField.addKeyListener(this);
 		
 		chatArea = new JTextArea();
 		chatArea.setText("로그인 되었습니다.");
 		chatArea.setEditable(false);
 		chatArea.setForeground(Color.BLACK);
 		//chatArea.setBounds(0, 0, 603, 289);
+		sv.setTextArea(chatArea);
 		
 		JScrollPane scrollPane = new JScrollPane(chatArea);
 		scrollPane.setLocation(0, 0);
@@ -65,10 +72,6 @@ public class LobbyUI extends JFrame implements ActionListener {
 		
 		setVisible(true);
 	}
-
-	public void addString(String str){
-		chatArea.append(str);
-	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -77,5 +80,27 @@ public class LobbyUI extends JFrame implements ActionListener {
 		else if(e.getSource() == btnExit){
 			dispose();
 		}
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if(e.getKeyCode() == KeyEvent.VK_ENTER){
+			sv.sendMessage(textField.getText());	
+			textField.setText("");
+		}
+			
+		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }
