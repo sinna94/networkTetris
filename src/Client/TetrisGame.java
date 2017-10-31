@@ -94,8 +94,6 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 					makeNewBlock();
 					board.setTouchFloor(false);
 				}
-
-			//	System.out.println(this.getX() + " " + this.getY() + " " + this.getWidth() + " "+ this.getHeight());
 				
 				if (board.gameover) {
 					JOptionPane.showMessageDialog(null, "GameOver");

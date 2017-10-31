@@ -29,7 +29,7 @@ public class Player extends Thread{
 			ois = new ObjectInputStream(socket.getInputStream());
 			oos = new ObjectOutputStream(socket.getOutputStream());
 			
-			output.println("LOADING");
+			//output.println("LOADING");
 			
 		}catch(IOException e){
 			System.out.println("연결이 끊어졌습니다.1");

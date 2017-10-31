@@ -22,10 +22,10 @@ public class LoginUI extends JFrame implements ActionListener {
 	private JButton loginButton;
 	private JButton cancelButton;
 	private JButton joinButton;
-	private ServerAccess sv;
+	private ServerAccess sa;
 	
-	public LoginUI(ServerAccess sv) throws IOException {
-		this.sv = sv;
+	public LoginUI(ServerAccess sa) throws IOException {
+		this.sa = sa;
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 280, 175);
@@ -77,13 +77,14 @@ public class LoginUI extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == loginButton) {
-			sv.login(idField.getText(), passwordField.getText());
+			sa.login(idField.getText(), passwordField.getText());
 			while (true) {
-				System.out.println(sv.isRecieve + " " + sv.loginOK);
-				if (sv.isRecieve){
-					if (sv.loginOK) {
-						new LobbyUI(sv);
+				System.out.println(sa.isRecieve + " " + sa.loginOK);
+				if (sa.isRecieve){
+					if (sa.loginOK) {
+						new LobbyUI(sa);
 						this.dispose();
+						
 					} else {
 						JOptionPane.showMessageDialog(null, "Æ²¸²");
 					}

@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -22,10 +23,13 @@ public class LobbyUI extends JFrame implements ActionListener, KeyListener {
 	private JTextArea chatArea;
 	private JButton btnGameStart;
 	private JButton btnExit;
-	private ServerAccess sv;
-	public LobbyUI(ServerAccess sv) {
+	JScrollPane scrollPane;
+	private ServerAccess sa;
+	
+	public LobbyUI(ServerAccess sa) {
 		
-		this.sv = sv;
+		this.sa = sa;
+		sa.setLobby(this);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 643, 424);
@@ -50,9 +54,8 @@ public class LobbyUI extends JFrame implements ActionListener, KeyListener {
 		chatArea.setEditable(false);
 		chatArea.setForeground(Color.BLACK);
 		//chatArea.setBounds(0, 0, 603, 289);
-		sv.setTextArea(chatArea);
 		
-		JScrollPane scrollPane = new JScrollPane(chatArea);
+		scrollPane = new JScrollPane(chatArea);
 		scrollPane.setLocation(0, 0);
 		scrollPane.setSize(603, 283);
 		chatPanel.add(scrollPane);
@@ -73,11 +76,27 @@ public class LobbyUI extends JFrame implements ActionListener, KeyListener {
 		setVisible(true);
 	}
 	
+	public void addString(String str){
+		chatArea.append(str);
+		scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
+	}
+	
+	public void runGame() throws IOException{
+		TetrisClient tc = new TetrisClient(this, sa);
+		this.setVisible(false);
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == btnGameStart){
+			sa.startGame();
 		}
 		else if(e.getSource() == btnExit){
+			try {
+				sa.closeSocket();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 			dispose();
 		}
 	}
@@ -85,10 +104,9 @@ public class LobbyUI extends JFrame implements ActionListener, KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_ENTER){
-			sv.sendMessage(textField.getText());	
+			sa.sendMessage(textField.getText());	
 			textField.setText("");
 		}
-			
 		
 	}
 

@@ -3,39 +3,40 @@ import java.io.IOException;
 
 public class TetrisClient extends Thread {
 	private TetrisGame game;
-	private LoadingUi loading;
+	private LobbyUI lobby;
 	private boolean start = true;
-	private ServerAccess sv;
+	private ServerAccess sa;
 	
-	public TetrisClient() throws IOException {
-		sv = new ServerAccess();
+	public TetrisClient(LobbyUI lobby, ServerAccess sa) throws IOException {
+		this.sa = sa;
+		this.lobby = lobby;
 	}
 	
 	public void run(){
 		String response;
 		
 		try{
-			response = sv.input.readLine();
+			response = sa.input.readLine();
 			
-			if(response.startsWith("LOADING")){
+			/*if(response.startsWith("LOADING")){
 				System.out.println("로딩중");
 				loading = new LoadingUi();
 				loading.setVisible(true);
-			}
+			}*/
 			
 			while(start){
-				response = sv.input.readLine();
+				response = sa.input.readLine();
 				
 				if(response.startsWith("READY")){			// 게임 준비
+					System.out.println("게임을 시작합니다.");
 					game = new TetrisGame();
 					game.setVisible(true);
-					loading.dispose();
 				}
 				
 				if(response.startsWith("GO")){				// 게임 시작
 					game.makeNewBlock();
 					
-					Thread t = new Thread(game);					// 시간이 지날때 마다 한 칸씩 블록이 내려오는 쓰레드
+					Thread t = new Thread(game);			// 시간이 지날때 마다 한 칸씩 블록이 내려오는 쓰레드
 					t.start();
 					
 					start = false;	
@@ -44,7 +45,7 @@ public class TetrisClient extends Thread {
 			}
 			
 			while(true){
-				response = sv.input.readLine();
+				response = sa.input.readLine();
 				
 				if(response.startsWith("OTHER")){				// 다른 클라이언트의 키 움직임
 					int KeyCode = Integer.valueOf(response.split(",")[1]);
@@ -80,7 +81,7 @@ public class TetrisClient extends Thread {
 			
 		} finally{
 			try{
-				sv.socket.close();
+				sa.socket.close();
 			} catch (IOException e){
 				System.out.println("2에러 " + e);
 				e.printStackTrace();

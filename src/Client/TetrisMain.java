@@ -5,13 +5,14 @@ import java.io.IOException;
 public class TetrisMain {
 	public static void main(String[] args) throws IOException  {
 		LoginUI login;
-		ServerAccess sv = new ServerAccess();
+		ServerAccess sa= new ServerAccess();
 		try {
-			sv.start();
-			login = new LoginUI(sv);
+			sa.start();
+			login = new LoginUI(sa);
 			login.setVisible(true);
 		} catch (IOException e) {
-			e.printStackTrace();
+			sa.closeSocket();
+			//e.printStackTrace();
 		}
 		
 	}

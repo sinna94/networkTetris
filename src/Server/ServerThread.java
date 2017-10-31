@@ -69,7 +69,7 @@ public class ServerThread extends Thread{
 	@Override
 	public void run() {		
 		try {
-			receiveAccount();
+			receiveAccount();										// 로그인 
 			System.out.println("로그인 완료");
 			while(true){
 				String response = input.readLine();
@@ -84,6 +84,11 @@ public class ServerThread extends Thread{
 					String chat = response.split(",")[1];
 					sm.sendAll("chat," + id + " : " + chat);
 				}
+				
+				if(response.startsWith("start")){
+					sm.addReadyQueue(socket);
+				}
+				
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -96,7 +101,6 @@ public class ServerThread extends Thread{
 				sm.socketClose(socket);
 				socket.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
