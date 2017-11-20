@@ -14,6 +14,5 @@ public class TetrisMain {
 			sa.closeSocket();
 			//e.printStackTrace();
 		}
-		
 	}
 }

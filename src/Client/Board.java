@@ -382,7 +382,7 @@ public class Board{
 			board[num][i] = initBoard;
 		}
 		if(!other)
-			TetrisClient.Key.delLine();
+			TetrisThread.Key.delLine();
 	}
 	
 	public void downLine(int num){								// topLine 밑으로 한줄 씩 내린다.

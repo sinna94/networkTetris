@@ -15,11 +15,14 @@ public class ServerThread extends Thread{
 
 	private Socket socket;
 	private ConnectDB db;
-	private ServerManager sm;
-	private BufferedReader input;
-	private PrintWriter output;
+	ServerManager sm;
+	public BufferedReader input;
+	public PrintWriter output;
 	private ObjectInputStream ois;
 	private String id;
+	private boolean socketOn = true;
+	
+	ServerThread other;
 	
 	public ServerThread(Socket socket, ServerManager sm) throws IOException {
 		this.socket = socket;
@@ -30,12 +33,20 @@ public class ServerThread extends Thread{
 		db = new ConnectDB();
 	}
 
+	public void setOther(ServerThread other){
+		this.other = other;
+	}
+	
 	public Socket getSocket(){
 		return socket;
 	}
 	
 	public String getID(){
 		return id;
+	}
+	
+	public void setSocketOn(boolean socketOn){
+		this.socketOn = socketOn;
 	}
 	
 	public void receiveAccount() throws ClassNotFoundException, IOException, SQLException{
@@ -66,27 +77,49 @@ public class ServerThread extends Thread{
 		output.println(str);
 	}
 	
+	public void saveWin(String winner, String loser) throws SQLException{
+		db.noExcuteQuery("INSERT INTO game (winner, loser) VALUES ('" + winner + "', '" + loser + "');");
+	}
+		
+	
 	@Override
 	public void run() {		
 		try {
 			receiveAccount();										// 로그인 
 			System.out.println("로그인 완료");
-			while(true){
+			while(socketOn){
 				String response = input.readLine();
-				
 				if(response == null){
 					continue;
 				}
-				
-				System.out.println(response);
-				
+								
 				if(response.startsWith("chat")){
 					String chat = response.split(",")[1];
 					sm.sendAll("chat," + id + " : " + chat);
 				}
 				
-				if(response.startsWith("start")){
-					sm.addReadyQueue(socket);
+				if(response.startsWith("start")){					// 클라이언트가 게임 시작을 누름
+					sm.addReadyQueue(this);
+				}
+				
+				if (response.startsWith("NEW")) {				//클라이언트에서 새로 생긴 블록 번호
+					other.output.println(response);
+				}
+
+				if(response.startsWith("MOVE")){					// 클라이언트에서 키보드를 누를 때 다른 클라이언트로 전송				
+					other.output.println("OTHER,"+ response.split(",")[1]);
+				}
+				
+				if(response.startsWith("DEL")){					// 클라이언트에서 라인을 부숨을 알림
+					int num = (int)(Math.random()*10);
+					output.println("OADD,"+num);
+					other.output.println("ADD,"+num);
+				}
+				
+				if(response.startsWith("QUIT")){
+					output.println("QUIT,lose");
+					other.output.println("QUIT,win");
+					saveWin(getID(), other.getID());
 				}
 				
 			}
@@ -99,13 +132,11 @@ public class ServerThread extends Thread{
 		} finally{
 			try {
 				sm.socketClose(socket);
+				System.out.println("소켓 종료T");
 				socket.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		
-		
 	}
-	
 }

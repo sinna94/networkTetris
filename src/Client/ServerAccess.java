@@ -23,6 +23,7 @@ public class ServerAccess extends Thread{
 	private boolean isRun = true; 
 	
 	private LobbyUI lobby;
+	private LoginUI login;
 	
 	public ServerAccess() throws IOException{
 		socket = new Socket("localhost", 9001);
@@ -39,6 +40,10 @@ public class ServerAccess extends Thread{
 	public void closeSocket() throws IOException{
 		socket.close();
 		isRun = false;
+	}
+	
+	public void setLogin(LoginUI login){
+		this.login = login;
 	}
 	
 	public void setLobby(LobbyUI lobby){
@@ -59,27 +64,32 @@ public class ServerAccess extends Thread{
 					}
 				}
 			
-			
 			if(response == null){
 				continue;
 			}
+			
 			System.out.println(response);
 			if(response.startsWith("login")){					// 로그인 정보 받기
 				String correct = response.split(",")[1];
 				if (correct.equals("true") == true) {
-					loginOK = true;
-					System.out.println("로그인 성공");
-				} 
-				isRecieve = true;
+					login.loginOK();
+				}
+				else{
+					login.loginFail();
+				}
 			}
 			if(response.startsWith("chat")){					// 채팅 받기
 				String chat = response.split(",")[1];
 				lobby.addString("\n"+chat);
 			}
-			if(response.startsWith("start")){
+			if(response.startsWith("start")){					// 게임 시작
 				try {
 					System.out.println("게임을 시작합니다.");
 					lobby.runGame();
+					TetrisGame game = new TetrisGame();
+					TetrisThread tt = new TetrisThread(lobby, this, game);
+					tt.go();
+										
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -106,5 +116,9 @@ public class ServerAccess extends Thread{
 	public void sendMessage(String text) {
 		output.println("chat," + text);
 		
+	}
+	
+	public void setIsRun(boolean run){
+		isRun = run;
 	}
 }

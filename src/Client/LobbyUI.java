@@ -25,6 +25,7 @@ public class LobbyUI extends JFrame implements ActionListener, KeyListener {
 	private JButton btnExit;
 	JScrollPane scrollPane;
 	private ServerAccess sa;
+	LoadingUi loading;
 	
 	public LobbyUI(ServerAccess sa) {
 		
@@ -81,14 +82,19 @@ public class LobbyUI extends JFrame implements ActionListener, KeyListener {
 		scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
 	}
 	
-	public void runGame() throws IOException{
-		TetrisClient tc = new TetrisClient(this, sa);
+	public void runGame() throws IOException{				// 테트리스 게임 창을 위해 로딩창과 로비창을 종료
+		loading.dispose();
 		this.setVisible(false);
+	}
+	
+	public void endGame(){
+		this.setVisible(true);
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == btnGameStart){
+			loading = new LoadingUi();
 			sa.startGame();
 		}
 		else if(e.getSource() == btnExit){

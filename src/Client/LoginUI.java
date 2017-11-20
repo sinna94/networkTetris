@@ -26,6 +26,7 @@ public class LoginUI extends JFrame implements ActionListener {
 	
 	public LoginUI(ServerAccess sa) throws IOException {
 		this.sa = sa;
+		sa.setLogin(this);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 280, 175);
@@ -74,28 +75,20 @@ public class LoginUI extends JFrame implements ActionListener {
 		buttonPanel.add(joinButton);
 	}
 
+	public void loginOK(){
+		new LobbyUI(sa);
+		this.dispose();
+	}
+	
+	public void loginFail(){
+		JOptionPane.showMessageDialog(null, "틀림");
+	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == loginButton) {
 			sa.login(idField.getText(), passwordField.getText());
-			while (true) {
-				System.out.println(sa.isRecieve + " " + sa.loginOK);
-				if (sa.isRecieve){
-					if (sa.loginOK) {
-						new LobbyUI(sa);
-						this.dispose();
-						
-					} else {
-						JOptionPane.showMessageDialog(null, "틀림");
-					}
-					break;
-				}
-				else{
-					continue;
-				}
-			}
 		}
-
+	
 		else if (e.getSource() == cancelButton) {
 			dispose();
 		} else if (e.getSource() == joinButton) {

@@ -21,13 +21,16 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 	public Board other = new Board(true);
 	private JPanel otherPanel;
 	private JPanel gamePanel;
-	
+	private Thread t;
+	private boolean run = true;
 	
 	public TetrisGame() {
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 547, 577);
 		addKeyListener(this);
+		setVisible(true);
+		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -96,8 +99,7 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 				}
 				
 				if (board.gameover) {
-					JOptionPane.showMessageDialog(null, "GameOver");
-					exit();
+					TetrisThread.Key.quitGame();
 				}
 
 				else {
@@ -115,16 +117,23 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 		gamePanel.setBounds(12, 10, 270, 520);
 		contentPane.add(gamePanel);
 		
-	//	board.makeBlock();
-	}
+		t = new Thread(this);
+		t.start();
+		blockMove(KeyEvent.VK_SPACE);
+	} 
 	
 	public void makeNewBlock(){
 		int blockNum = (int) (Math.random() * 7);
-		TetrisClient.Key.newBlock(blockNum);
+		TetrisThread.Key.newBlock(blockNum);
 		board.makeBlock(blockNum);
 	}
 	
-	public void exit(){
+	public void exit(String win){
+		run = false;
+		if(win.equals("win") == true)
+			JOptionPane.showMessageDialog(null, "승리했습니다.");
+		else
+			JOptionPane.showMessageDialog(null, "패배했습니다.");
 		this.dispose();
 	}
 	
@@ -148,7 +157,7 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 	
 	public void blockMove(int KeyCode){
 		board.moveBlock(KeyCode);
-		TetrisClient.Key.moveBlock(KeyCode);
+		TetrisThread.Key.moveBlock(KeyCode);
 		repaint();
 	}
 	
@@ -159,13 +168,13 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 
 	public void run() {
 		try {
-			while (true) {
+			while (run) {
 				Thread.sleep(1000);
 				blockMove(KeyEvent.VK_DOWN);
 			}
 		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-
 	}
 
 }
