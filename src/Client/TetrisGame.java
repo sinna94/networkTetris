@@ -93,7 +93,8 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 					makeNewBlock();
 					board.setTouchFloor(false);
 					
-					int num = (int) (Math.random() * 20);
+					//int num = (int) (Math.random() * 20);
+					int num = 0;
 					if(num < 4 && itemName.getText().equals("") == true){
 						board.setItem(num);
 						switch(num){

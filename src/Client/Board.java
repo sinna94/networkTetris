@@ -3,6 +3,8 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
+import Client.TetrisThread.Key;
+
 public class Board{
 
 	final int boardW = 10;
@@ -167,7 +169,7 @@ public class Board{
 				currentBlockInit();
 				moveOk = checkBlockDown(board);
 				BlockDown(board, moveOk);
-				top();
+				searchTop();
 				break;
 				
 			case KeyEvent.VK_UP:
@@ -199,7 +201,7 @@ public class Board{
 					moveOk = checkBlockDown(board);
 					BlockDown(board, moveOk);
 				}
-				top();
+				searchTop();
 				break;
 				
 			case KeyEvent.VK_V:
@@ -362,7 +364,7 @@ public class Board{
 		return true;
 	}
 
-	public void top(){											// 쌓인 블록의 가장 위를 찾는다
+	public void searchTop(){											// 쌓인 블록의 가장 위를 찾는다
 		for (int i = boardH - 1; i > 0; i--) {
 			if(isBlock(board[i])){
 				topLine = boardH - i;
@@ -393,7 +395,7 @@ public class Board{
 		return true;
 	}
 	
-	public void delLine(int num, boolean item){								// 한줄을 삭제한다.
+	public void delLine(int num, boolean item){					// 한줄을 삭제한다.
 		for(int i = 0; i < boardW ; i++){
 			board[num][i] = initBoard;
 		}
@@ -461,11 +463,12 @@ public class Board{
 		if(item > -1 && item < 4){
 			switch(item){
 			case 0:
-				delLine(boardH-1, true);
+				itemLineDel();
 				break;
 			case 1:
-				delLine(boardH-1, true);
-				delLine(boardH-2, true);
+				for(int i =0;i<2;i++){
+					itemLineDel();
+				}
 				break;
 			case 2:
 				TetrisThread.Key.delLine();
@@ -476,8 +479,18 @@ public class Board{
 				}
 				break;
 			}
+			Key.useItem(item);
 			item = -1;
 		}
+	}
+	
+	public void itemLineDel(){
+		currentBlockInit();
+		searchTop();
+		delLine(boardH-1, true);
+		downLine(boardH-1);
+		topLine++;
+		addBlock(block.getLocation());
 	}
 	
 }
