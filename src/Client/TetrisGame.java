@@ -23,6 +23,7 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 	private JPanel gamePanel;
 	private Thread t;
 	private boolean run = true;
+	private JLabel itemName;
 	
 	public TetrisGame() {
 		setResizable(false);
@@ -36,24 +37,19 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		JPanel scorePanel = new JPanel();
-		scorePanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		scorePanel.setBounds(298, 10, 221, 59);
-		contentPane.add(scorePanel);
-		scorePanel.setLayout(new BorderLayout(0, 0));
+		JPanel itemPanel = new JPanel();
+		itemPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		itemPanel.setBounds(298, 10, 232, 59);
+		contentPane.add(itemPanel);
+		itemPanel.setLayout(new BorderLayout(0, 0));
 
-		JLabel lblScore = new JLabel("SCORE");
-		lblScore.setHorizontalAlignment(SwingConstants.CENTER);
-		scorePanel.add(lblScore, BorderLayout.NORTH);
+		JLabel lblItem = new JLabel("ITEM");
+		lblItem.setHorizontalAlignment(SwingConstants.CENTER);
+		itemPanel.add(lblItem, BorderLayout.NORTH);
 
-		JLabel lblNewLabel = new JLabel("New label");
-		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		scorePanel.add(lblNewLabel, BorderLayout.CENTER);
-
-		JPanel blockPanel = new JPanel();
-		blockPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		blockPanel.setBounds(298, 76, 221, 94);
-		contentPane.add(blockPanel);
+		itemName = new JLabel("");
+		itemName.setHorizontalAlignment(SwingConstants.CENTER);
+		itemPanel.add(itemName, BorderLayout.CENTER);
 		
 		otherPanel = new JPanel(){
 			public void paintComponent(Graphics g) {
@@ -81,7 +77,7 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 		otherPanel.setBackground(Color.LIGHT_GRAY);
 		
 		otherPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		otherPanel.setBounds(300, 210, 230, 320);
+		otherPanel.setBounds(300, 79, 230, 451);
 		contentPane.add(otherPanel);
 		
 		gamePanel = new JPanel(){
@@ -96,6 +92,26 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 				if (board.getTouchFloor()) { // 블록이 내려갈 수 없을 때 새로운 블록을 만듬
 					makeNewBlock();
 					board.setTouchFloor(false);
+					
+					int num = (int) (Math.random() * 20);
+					if(num < 4 && itemName.getText().equals("") == true){
+						board.setItem(num);
+						switch(num){
+						case 0:
+							itemName.setText("1줄 삭제");
+							break;
+						case 1:
+							itemName.setText("2줄 삭제");
+							break;
+						case 2:
+							itemName.setText("1줄 추가");
+							break;
+						case 3:
+							itemName.setText("커트");
+							break;
+						}
+						itemName.setText("");
+					}
 				}
 				
 				if (board.gameover) {
