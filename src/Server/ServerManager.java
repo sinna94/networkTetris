@@ -84,7 +84,6 @@ public class ServerManager extends Thread{
 				
 				sendReady(searchSocket(s1));
 				sendReady(searchSocket(s2));
-				
 			}
 			try {
 				sleep(1000);

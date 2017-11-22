@@ -16,8 +16,6 @@ public class TetrisThread{
 		String response;
 		
 		try{
-			//game.makeNewBlock();
-
 			while (true) {
 				response = sa.input.readLine();
 				if (response.startsWith("OTHER")) { // 다른 클라이언트의 키 움직임
@@ -59,6 +57,7 @@ public class TetrisThread{
 					case 2:
 						break;
 					case 3:
+						game.other.itemCut();
 						break;
 					}
 				}

@@ -17,7 +17,7 @@ import javax.swing.border.LineBorder;
 public class TetrisGame extends JFrame implements KeyListener, Runnable{
 
 	private JPanel contentPane;
-	public Board board = new Board(false);
+	public Board board = new Board(false, this);
 	public Board other = new Board(true);
 	private JPanel otherPanel;
 	private JPanel gamePanel;
@@ -92,27 +92,6 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 				if (board.getTouchFloor()) { // 블록이 내려갈 수 없을 때 새로운 블록을 만듬
 					makeNewBlock();
 					board.setTouchFloor(false);
-					
-					//int num = (int) (Math.random() * 20);
-					int num = 0;
-					if(num < 4 && itemName.getText().equals("") == true){
-						board.setItem(num);
-						switch(num){
-						case 0:
-							itemName.setText("1줄 삭제");
-							break;
-						case 1:
-							itemName.setText("2줄 삭제");
-							break;
-						case 2:
-							itemName.setText("1줄 추가");
-							break;
-						case 3:
-							itemName.setText("커트");
-							break;
-						}
-						itemName.setText("");
-					}
 				}
 				
 				if (board.gameover) {
@@ -138,6 +117,10 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 		t.start();
 		blockMove(KeyEvent.VK_SPACE);
 	} 
+	
+	public void setItemName(String name){
+		itemName.setText(name);
+	}
 	
 	public void makeNewBlock(){
 		int blockNum = (int) (Math.random() * 7);

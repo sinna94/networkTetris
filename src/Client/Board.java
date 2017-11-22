@@ -11,6 +11,7 @@ public class Board{
 	final int boardH = 20;
 
 	public boolean other;
+	private TetrisGame game;
 	
 	private Color[][] board = new Color[boardH][boardW];
 	private int[][] currentBlockLocation = new int[4][2];
@@ -23,6 +24,7 @@ public class Board{
 	private int fullLine;
 	public boolean gameover = false;
 	private int item = -1;
+
 	
 	public Board(boolean other) {
 		for (int i = 0; i < boardH; i++) {					// 보드 초기화
@@ -31,6 +33,16 @@ public class Board{
 			}
 		}
 		this.other = other;
+	}
+	
+	public Board(boolean other, TetrisGame game) {
+		for (int i = 0; i < boardH; i++) {					// 보드 초기화
+			for (int j = 0; j < boardW; j++) {
+				board[i][j] = initBoard;
+			}
+		}
+		this.other = other;
+		this.game = game;
 	}
 
 	public Color[][] getBoard() {
@@ -76,7 +88,6 @@ public class Board{
 	}
 	
 	public void makeBlock(int blockNum) { 								// 블록 생성
-	//	int blockNum = (int) (Math.random() * 7);
 		int[][] location = new int[4][2];
 
 		switch (blockNum) {
@@ -395,12 +406,33 @@ public class Board{
 		return true;
 	}
 	
-	public void delLine(int num, boolean item){					// 한줄을 삭제한다.
+	public void delLine(int num, boolean useItem){					// 한줄을 삭제한다.
 		for(int i = 0; i < boardW ; i++){
 			board[num][i] = initBoard;
 		}
-		if(!other && !item)
+		if(!other && !useItem){					
 			TetrisThread.Key.delLine();
+			int inum = (int) (Math.random() * 6);					// 아이템 생성 
+			if(inum < 4 && item == -1){
+				item = inum;
+				System.out.println(inum);
+				switch(num){
+				case 0:
+					game.setItemName("1줄 삭제");
+					break;
+				case 1:
+					game.setItemName("2줄 삭제");
+					break;
+				case 2:
+					game.setItemName("1줄 추가");
+					break;
+				case 3:
+					game.setItemName("커트");
+					break;
+				}
+				game.setItemName("");
+			}
+		}
 	}
 	
 	public void downLine(int num){								// topLine 밑으로 한줄 씩 내린다.
@@ -474,9 +506,7 @@ public class Board{
 				TetrisThread.Key.delLine();
 				break;
 			case 3:
-				for(int i=0;i<3;i++){
-					delLine(boardH-(topLine--), true);
-				}
+				itemCut();				
 				break;
 			}
 			Key.useItem(item);
@@ -493,4 +523,12 @@ public class Board{
 		addBlock(block.getLocation());
 	}
 	
+	public void itemCut(){
+		currentBlockInit();
+		for(int i=0;i<3;i++){
+			searchTop();
+			delLine(boardH - topLine, true);
+		}
+		addBlock(block.getLocation());
+	}
 }
