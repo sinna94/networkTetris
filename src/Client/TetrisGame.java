@@ -17,12 +17,13 @@ import javax.swing.border.LineBorder;
 public class TetrisGame extends JFrame implements KeyListener, Runnable{
 
 	private JPanel contentPane;
-	public Board board = new Board(false);
+	public Board board = new Board(false, this);
 	public Board other = new Board(true);
 	private JPanel otherPanel;
 	private JPanel gamePanel;
 	private Thread t;
 	private boolean run = true;
+	private JLabel itemName;
 	
 	public TetrisGame() {
 		setResizable(false);
@@ -36,24 +37,19 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		JPanel scorePanel = new JPanel();
-		scorePanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		scorePanel.setBounds(298, 10, 221, 59);
-		contentPane.add(scorePanel);
-		scorePanel.setLayout(new BorderLayout(0, 0));
+		JPanel itemPanel = new JPanel();
+		itemPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		itemPanel.setBounds(298, 10, 232, 59);
+		contentPane.add(itemPanel);
+		itemPanel.setLayout(new BorderLayout(0, 0));
 
-		JLabel lblScore = new JLabel("SCORE");
-		lblScore.setHorizontalAlignment(SwingConstants.CENTER);
-		scorePanel.add(lblScore, BorderLayout.NORTH);
+		JLabel lblItem = new JLabel("ITEM");
+		lblItem.setHorizontalAlignment(SwingConstants.CENTER);
+		itemPanel.add(lblItem, BorderLayout.NORTH);
 
-		JLabel lblNewLabel = new JLabel("New label");
-		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		scorePanel.add(lblNewLabel, BorderLayout.CENTER);
-
-		JPanel blockPanel = new JPanel();
-		blockPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		blockPanel.setBounds(298, 76, 221, 94);
-		contentPane.add(blockPanel);
+		itemName = new JLabel("");
+		itemName.setHorizontalAlignment(SwingConstants.CENTER);
+		itemPanel.add(itemName, BorderLayout.CENTER);
 		
 		otherPanel = new JPanel(){
 			public void paintComponent(Graphics g) {
@@ -81,7 +77,7 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 		otherPanel.setBackground(Color.LIGHT_GRAY);
 		
 		otherPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		otherPanel.setBounds(300, 210, 230, 320);
+		otherPanel.setBounds(300, 79, 230, 451);
 		contentPane.add(otherPanel);
 		
 		gamePanel = new JPanel(){
@@ -121,6 +117,10 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 		t.start();
 		blockMove(KeyEvent.VK_SPACE);
 	} 
+	
+	public void setItemName(String name){
+		itemName.setText(name);
+	}
 	
 	public void makeNewBlock(){
 		int blockNum = (int) (Math.random() * 7);

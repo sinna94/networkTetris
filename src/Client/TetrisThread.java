@@ -16,8 +16,6 @@ public class TetrisThread{
 		String response;
 		
 		try{
-			//game.makeNewBlock();
-
 			while (true) {
 				response = sa.input.readLine();
 				if (response.startsWith("OTHER")) { // 다른 클라이언트의 키 움직임
@@ -45,6 +43,24 @@ public class TetrisThread{
 					lobby.endGame();
 					break;
 				}
+				if (response.startsWith("ITEM")){
+					int num = Integer.valueOf(response.split(",")[1]);
+					switch(num){
+					case 0:
+						game.other.itemLineDel();
+						break;
+					case 1:
+						for(int i =0;i<2;i++){
+							game.other.itemLineDel();
+						}
+						break;
+					case 2:
+						break;
+					case 3:
+						game.other.itemCut();
+						break;
+					}
+				}
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
@@ -64,7 +80,6 @@ public class TetrisThread{
 		public static void moveBlock(int keyCode) { // 서버로 키 코드 전송
 			ServerAccess.output.println("MOVE,"+ keyCode);
 		}
-
 		public static void newBlock(int blockNum) { // 서버로 블록 번호 전송
 			ServerAccess.output.println("NEW," + blockNum);
 		}
@@ -73,6 +88,9 @@ public class TetrisThread{
 		}
 		public static void quitGame(){
 			ServerAccess.output.println("QUIT");
+		}
+		public static void useItem(int num){
+			ServerAccess.output.println("ITEM,"+num);
 		}
 	}
 }

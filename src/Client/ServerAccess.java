@@ -68,7 +68,6 @@ public class ServerAccess extends Thread{
 				continue;
 			}
 			
-			System.out.println(response);
 			if(response.startsWith("login")){					// 로그인 정보 받기
 				String correct = response.split(",")[1];
 				if (correct.equals("true") == true) {

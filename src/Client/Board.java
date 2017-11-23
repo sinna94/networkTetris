@@ -3,12 +3,15 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
+import Client.TetrisThread.Key;
+
 public class Board{
 
 	final int boardW = 10;
 	final int boardH = 20;
 
 	public boolean other;
+	private TetrisGame game;
 	
 	private Color[][] board = new Color[boardH][boardW];
 	private int[][] currentBlockLocation = new int[4][2];
@@ -20,6 +23,8 @@ public class Board{
 	private int topLine;
 	private int fullLine;
 	public boolean gameover = false;
+	private int item = -1;
+
 	
 	public Board(boolean other) {
 		for (int i = 0; i < boardH; i++) {					// 보드 초기화
@@ -28,6 +33,16 @@ public class Board{
 			}
 		}
 		this.other = other;
+	}
+	
+	public Board(boolean other, TetrisGame game) {
+		for (int i = 0; i < boardH; i++) {					// 보드 초기화
+			for (int j = 0; j < boardW; j++) {
+				board[i][j] = initBoard;
+			}
+		}
+		this.other = other;
+		this.game = game;
 	}
 
 	public Color[][] getBoard() {
@@ -73,7 +88,6 @@ public class Board{
 	}
 	
 	public void makeBlock(int blockNum) { 								// 블록 생성
-	//	int blockNum = (int) (Math.random() * 7);
 		int[][] location = new int[4][2];
 
 		switch (blockNum) {
@@ -142,6 +156,18 @@ public class Board{
 			currentBlockLocation[i][1] = location[i][1] + x;
 		}
 	}
+	
+	public void upAddBlock(int[][] location){
+		int[][] XY = new int[4][2];
+		int x = currentBlockLocation[2][1];						//(0, 0) 자리임 
+		int y = currentBlockLocation[2][0];
+		
+		for (int i = 0; i < XY.length; i++) {
+			board[location[i][0] + y - 1][location[i][1] + x] = getCurrentBlockColor();
+			currentBlockLocation[i][0] = location[i][0] + y - 1;
+			currentBlockLocation[i][1] = location[i][1] + x;
+		}
+	}
 
 	// 블록 이동, 회전 관련
 	
@@ -154,7 +180,7 @@ public class Board{
 				currentBlockInit();
 				moveOk = checkBlockDown(board);
 				BlockDown(board, moveOk);
-				top();
+				searchTop();
 				break;
 				
 			case KeyEvent.VK_UP:
@@ -186,7 +212,11 @@ public class Board{
 					moveOk = checkBlockDown(board);
 					BlockDown(board, moveOk);
 				}
-				top();
+				searchTop();
+				break;
+				
+			case KeyEvent.VK_V:
+				useItem(item);
 				break;
 				
 			default:
@@ -199,14 +229,14 @@ public class Board{
 		}
 	}
 
-	public void currentBlockInit(){
-		for (int i = 0; i < currentBlockLocation.length; i++) {													// 현재 블록 위치 초기화
+	public void currentBlockInit(){																				// 현재 블록 위치 초기화
+		for (int i = 0; i < currentBlockLocation.length; i++) {																
 			this.board[currentBlockLocation[i][0]][currentBlockLocation[i][1]] = initBoard;
 		}
 	}
 	
-	public void returnBlock(){
-		for (int i = 0; i < currentBlockLocation.length; i++) {													// 현재 블록 위치 복구
+	public void returnBlock(){																					// 현재 블록 위치 복구
+		for (int i = 0; i < currentBlockLocation.length; i++) {													
 			this.board[currentBlockLocation[i][0]][currentBlockLocation[i][1]] = getCurrentBlockColor();
 		}
 	}
@@ -251,7 +281,6 @@ public class Board{
 				if (currentBlockLocation[i][0] == boardH - 1) {													// 블록이 바닥에 닿았는지 확인
 					setTouchFloor(true);
 				}
-				
 				board[currentBlockLocation[i][0]][currentBlockLocation[i][1]] = getCurrentBlockColor();
 			}
 		} else
@@ -346,7 +375,7 @@ public class Board{
 		return true;
 	}
 
-	public void top(){											// 쌓인 블록의 가장 위를 찾는다
+	public void searchTop(){											// 쌓인 블록의 가장 위를 찾는다
 		for (int i = boardH - 1; i > 0; i--) {
 			if(isBlock(board[i])){
 				topLine = boardH - i;
@@ -377,14 +406,16 @@ public class Board{
 		return true;
 	}
 	
-	public void delLine(int num){								// 한줄을 삭제한다.
+	public void delLine(int num, boolean useItem){					// 한줄을 삭제한다.
 		for(int i = 0; i < boardW ; i++){
 			board[num][i] = initBoard;
 		}
-		if(!other)
+		if(!other && !useItem){					
 			TetrisThread.Key.delLine();
+			makeItem();
+		}
 	}
-	
+			
 	public void downLine(int num){								// topLine 밑으로 한줄 씩 내린다.
 		for(int i = num; i >= boardH - topLine ; i--){
 			board[i] = board[i-1].clone(); 
@@ -395,7 +426,7 @@ public class Board{
 		for (int i = 0; i <= boardH - 1; i++) {		
 			if(isFull(board[i]) == true){
 				fullLine = i;
-				delLine(fullLine);
+				delLine(fullLine, false);
 				downLine(fullLine);
 				topLine++;
 			}
@@ -406,7 +437,7 @@ public class Board{
 		return touchFloor;
 	}
 	
-	public void upLine(){
+	public void upLine(){										// 쌓인 블록들을 한줄씩 올린다.
 		currentBlockInit();
 		for(int i = boardH - topLine; i < boardH - 1  ; i++){
 			board[i] = board[i+1].clone(); 
@@ -415,11 +446,15 @@ public class Board{
 		for(int i = 0;i <boardW;i++){
 			board[boardH-1][i] = initBoard;
 		}
-		addBlock(block.getLocation());
+		int[][] loc = block.getLocation();
+		
+		upAddBlock(loc);
+		
+		moveBlock(KeyEvent.VK_DOWN);
 		topLine++;
 	}
 	
-	public void makeLine(int num){
+	public void makeLine(int num){								// upLine 후 맨 아래에 빈 공간이 하나 있는 줄을 생성한다.
 		upLine();
 				
 		for(int i = 0;i <boardW;i++){
@@ -427,5 +462,77 @@ public class Board{
 				board[boardH-1][i] = Color.DARK_GRAY;
 			}
 		}
+	}
+
+	public int getItem() {
+		return item;
+	}
+
+	public void setItem(int item) {
+		this.item = item;
+	}
+	
+	public void makeItem(){											// 아이템을 랜덤으로 생성한다. 
+		int inum = (int) (Math.random() * 6);					
+		if(inum < 4 && item == -1){
+			item = inum;
+			System.out.println(inum);
+			switch(item){
+			case 0:
+				game.setItemName("1줄 삭제");
+				break;
+			case 1:
+				game.setItemName("2줄 삭제");
+				break;
+			case 2:
+				game.setItemName("1줄 추가");
+				break;
+			case 3:
+				game.setItemName("커트");
+				break;
+			}
+		}
+	}
+	
+	public void useItem(int item){
+		if(item > -1 && item < 4){
+			switch(item){
+			case 0:
+				itemLineDel();
+				break;
+			case 1:
+				for(int i =0;i<2;i++){
+					itemLineDel();
+				}
+				break;
+			case 2:
+				TetrisThread.Key.delLine();
+				break;
+			case 3:
+				itemCut();				
+				break;
+			}
+			Key.useItem(item);
+			game.setItemName("");
+			this.item = -1;
+		}
+	}
+	
+	public void itemLineDel(){
+		currentBlockInit();
+		searchTop();
+		delLine(boardH-1, true);
+		downLine(boardH-1);
+		topLine++;
+		addBlock(block.getLocation());
+	}
+	
+	public void itemCut(){
+		currentBlockInit();
+		for(int i=0;i<3;i++){
+			searchTop();
+			delLine(boardH - topLine, true);
+		}
+		addBlock(block.getLocation());
 	}
 }

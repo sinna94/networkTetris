@@ -122,6 +122,10 @@ public class ServerThread extends Thread{
 					saveWin(getID(), other.getID());
 				}
 				
+				if(response.startsWith("ITEM")){
+					other.output.println(response);
+				}
+				
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
