@@ -8,7 +8,7 @@ import Client.TetrisThread.Key;
 public class Board{
 
 	final int boardW = 10;
-	final int boardH = 20;
+	final int boardH = 21;
 
 	public boolean other;
 	private TetrisGame game;
@@ -128,7 +128,7 @@ public class Board{
 		fullLine();
 		
 		for (int i = 0; i < location.length; i++) {
-			XY[i][0] = -1*location[i][1];					// yÃà
+			XY[i][0] = (-1*location[i][1])+1;					// yÃà
 			XY[i][1] = ((location[i][0]) + (boardW / 2));	// xÃà
 		}
 		

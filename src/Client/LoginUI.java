@@ -77,6 +77,7 @@ public class LoginUI extends JFrame implements ActionListener {
 
 	public void loginOK(){
 		new LobbyUI(sa);
+		sa.setUserId(idField.getText());
 		this.dispose();
 	}
 	
@@ -90,7 +91,7 @@ public class LoginUI extends JFrame implements ActionListener {
 		}
 	
 		else if (e.getSource() == cancelButton) {
-			dispose();
+			System.exit(1);
 		} else if (e.getSource() == joinButton) {
 
 		}

@@ -1,36 +1,38 @@
 package Client;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import Communication.Account;
+import Communication.DataList;
 
 public class ServerAccess extends Thread{
 	public Socket socket;
 	public BufferedReader input;
 	public static PrintWriter output;
 	public ObjectOutputStream oos;
-	public BufferedWriter bos;
+	public ObjectInputStream ois;
 	public boolean loginOK = false;
 	public boolean isRecieve = false;
 	private boolean isRun = true; 
 	
 	private LobbyUI lobby;
 	private LoginUI login;
+	private RecordUI record;
+	
+	private String userId;
 	
 	public ServerAccess() throws IOException{
 		socket = new Socket("localhost", 9001);
 		input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		output = new PrintWriter(socket.getOutputStream(), true);
 		oos = new ObjectOutputStream(socket.getOutputStream());
-		bos = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+		ois = new ObjectInputStream(socket.getInputStream());
 	}
 	
 	public Socket getSocket(){
@@ -48,6 +50,10 @@ public class ServerAccess extends Thread{
 	
 	public void setLobby(LobbyUI lobby){
 		this.lobby = lobby;
+	}
+	
+	public void setRecord(RecordUI record){
+		this.record = record;
 	}
 		
 	public void run(){
@@ -81,6 +87,20 @@ public class ServerAccess extends Thread{
 				String chat = response.split(",")[1];
 				lobby.addString("\n"+chat);
 			}
+			
+			if(response.startsWith("record")){
+				try {
+					DataList list = (DataList) ois.readObject();
+					record.setRecord(list);
+					record.addData();
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+			}
+			
 			if(response.startsWith("start")){					// 게임 시작
 				try {
 					System.out.println("게임을 시작합니다.");
@@ -119,5 +139,13 @@ public class ServerAccess extends Thread{
 	
 	public void setIsRun(boolean run){
 		isRun = run;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 }

@@ -57,17 +57,17 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 				
 				int boardW = this.getWidth();
 				int boardH = this.getHeight();
-				int blockW = boardW / 10;
-				int blockH = boardH / 20;
+				int blockW = boardW/ 10;
+				int blockH = (boardH - 1) / 20;
 			
 				if (other.getTouchFloor()) { // 블록이 내려갈 수 없을 때 새로운 블록을 만듬
 					other.setTouchFloor(false);
 				}
 				
-				for (int i = 0; i < other.boardH; i++) {
+				for (int i = 1; i < other.boardH; i++) {
 					for (int j = 0; j < other.boardW; j++) {
 						g.setColor(other.getBoard()[i][j]);
-						g.fill3DRect(j * blockW, i * blockH, blockW, blockH, false); // 상대보드
+						g.fill3DRect(j * blockW, (i-1) * blockH, blockW, blockH, false); // 상대보드
 					}
 				}
 
@@ -87,7 +87,7 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 				int boardW = this.getWidth();
 				int boardH = this.getHeight();
 				int blockW = boardW / 10;
-				int blockH = boardH / 20;
+				int blockH = (boardH - 1) / 20;
 							
 				if (board.getTouchFloor()) { // 블록이 내려갈 수 없을 때 새로운 블록을 만듬
 					makeNewBlock();
@@ -99,10 +99,10 @@ public class TetrisGame extends JFrame implements KeyListener, Runnable{
 				}
 
 				else {
-					for (int i = 0; i < board.boardH; i++) {
+					for (int i = 1; i < board.boardH; i++) {
 						for (int j = 0; j < board.boardW; j++) {
 							g.setColor(board.getBoard()[i][j]);
-							g.fill3DRect(j * blockW, i * blockH, blockW, blockH, false);			// 내 보드
+							g.fill3DRect(j * blockW, (i-1) * blockH, blockW, blockH, false);			// 내 보드
 						}
 					}
 				}

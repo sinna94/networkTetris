@@ -26,6 +26,7 @@ public class LobbyUI extends JFrame implements ActionListener, KeyListener {
 	JScrollPane scrollPane;
 	private ServerAccess sa;
 	LoadingUi loading;
+	JButton btnRecord;
 	
 	public LobbyUI(ServerAccess sa) {
 		
@@ -72,6 +73,10 @@ public class LobbyUI extends JFrame implements ActionListener, KeyListener {
 		
 		btnExit = new JButton("Exit");
 		btnExit.addActionListener(this);
+		
+		btnRecord = new JButton("Record");
+		btnRecord.addActionListener(this);
+		buttonPanel.add(btnRecord);
 		buttonPanel.add(btnExit);
 		
 		setVisible(true);
@@ -98,12 +103,10 @@ public class LobbyUI extends JFrame implements ActionListener, KeyListener {
 			sa.startGame();
 		}
 		else if(e.getSource() == btnExit){
-			try {
-				sa.closeSocket();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			dispose();
+			System.exit(1);
+		}
+		else if(e.getSource() == btnRecord){
+			new RecordUI(sa);
 		}
 	}
 

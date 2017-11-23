@@ -4,12 +4,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
-import Client.Account;
+import Communication.Account;
+import Communication.DataList;
+import Communication.Record;
 
 public class ServerThread extends Thread{
 
@@ -19,8 +23,11 @@ public class ServerThread extends Thread{
 	public BufferedReader input;
 	public PrintWriter output;
 	private ObjectInputStream ois;
+	private ObjectOutputStream oos;
 	private String id;
 	private boolean socketOn = true;
+	
+	private ArrayList<Record> recordList= new ArrayList<>();
 	
 	ServerThread other;
 	
@@ -29,6 +36,7 @@ public class ServerThread extends Thread{
 		this.sm = sm;
 		input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		ois = new ObjectInputStream(socket.getInputStream());
+		oos = new ObjectOutputStream(socket.getOutputStream());
 		output = new PrintWriter(socket.getOutputStream(), true);
 		db = new ConnectDB();
 	}
@@ -51,7 +59,7 @@ public class ServerThread extends Thread{
 	
 	public void receiveAccount() throws ClassNotFoundException, IOException, SQLException{
 		while (true) {
-			Account account = (Client.Account) ois.readObject();		// account  객체 클라이언트에서 전송 받음
+			Account account = (Communication.Account) ois.readObject();		// account  객체 클라이언트에서 전송 받음
 			
 			if(account == null){
 				continue;
@@ -98,6 +106,26 @@ public class ServerThread extends Thread{
 					sm.sendAll("chat," + id + " : " + chat);
 				}
 				
+				if(response.startsWith("RECORD")){
+					String query = "SELECT * FROM tetris.game WHERE winner = '" + id + "' or loser = '" + id + "';";
+					ResultSet rs = db.getQueryResult(query);
+					
+					while(rs.next()){
+						Record record = new Record();
+						record.setWinner(rs.getString("winner"));
+						record.setLoser(rs.getString("loser"));
+						record.setDate(rs.getString("Date"));
+						recordList.add(record);
+					}
+					
+					output.println("record");
+					DataList list = new DataList();
+					list.setList(recordList);
+					oos.writeObject(list);
+					oos.flush();
+					oos.reset();
+				}
+				
 				if(response.startsWith("start")){					// 클라이언트가 게임 시작을 누름
 					sm.addReadyQueue(this);
 				}
@@ -136,7 +164,6 @@ public class ServerThread extends Thread{
 		} finally{
 			try {
 				sm.socketClose(socket);
-				System.out.println("소켓 종료T");
 				socket.close();
 			} catch (IOException e) {
 				e.printStackTrace();

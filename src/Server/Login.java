@@ -7,7 +7,7 @@ import java.net.Socket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import Client.Account;
+import Communication.Account;
 
 public class Login implements Runnable{
 
@@ -26,7 +26,7 @@ public class Login implements Runnable{
 			boolean c = true;
 			
 			while (c) {
-				Account account = (Client.Account) ois.readObject();		// account  객체 클라이언트에서 전송 받음
+				Account account = (Communication.Account) ois.readObject();		// account  객체 클라이언트에서 전송 받음
 				
 				if(account == null){
 					continue;

@@ -21,6 +21,7 @@ public class Server {
 				t.start();
 			}
 		} finally{
+			ss.close();
 		}
 	}
 	
