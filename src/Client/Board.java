@@ -412,29 +412,10 @@ public class Board{
 		}
 		if(!other && !useItem){					
 			TetrisThread.Key.delLine();
-			int inum = (int) (Math.random() * 6);					// 아이템 생성 
-			if(inum < 4 && item == -1){
-				item = inum;
-				System.out.println(inum);
-				switch(num){
-				case 0:
-					game.setItemName("1줄 삭제");
-					break;
-				case 1:
-					game.setItemName("2줄 삭제");
-					break;
-				case 2:
-					game.setItemName("1줄 추가");
-					break;
-				case 3:
-					game.setItemName("커트");
-					break;
-				}
-				game.setItemName("");
-			}
+			makeItem();
 		}
 	}
-	
+			
 	public void downLine(int num){								// topLine 밑으로 한줄 씩 내린다.
 		for(int i = num; i >= boardH - topLine ; i--){
 			board[i] = board[i-1].clone(); 
@@ -491,6 +472,28 @@ public class Board{
 		this.item = item;
 	}
 	
+	public void makeItem(){											// 아이템을 랜덤으로 생성한다. 
+		int inum = (int) (Math.random() * 6);					
+		if(inum < 4 && item == -1){
+			item = inum;
+			System.out.println(inum);
+			switch(item){
+			case 0:
+				game.setItemName("1줄 삭제");
+				break;
+			case 1:
+				game.setItemName("2줄 삭제");
+				break;
+			case 2:
+				game.setItemName("1줄 추가");
+				break;
+			case 3:
+				game.setItemName("커트");
+				break;
+			}
+		}
+	}
+	
 	public void useItem(int item){
 		if(item > -1 && item < 4){
 			switch(item){
@@ -510,7 +513,8 @@ public class Board{
 				break;
 			}
 			Key.useItem(item);
-			item = -1;
+			game.setItemName("");
+			this.item = -1;
 		}
 	}
 	
