@@ -10,6 +10,7 @@ import java.net.Socket;
 
 import Communication.Account;
 import Communication.DataList;
+import Communication.LoginList;
 
 public class ServerAccess extends Thread{
 	public Socket socket;
@@ -78,6 +79,17 @@ public class ServerAccess extends Thread{
 				String correct = response.split(",")[1];
 				if (correct.equals("true") == true) {
 					login.loginOK();
+					try {
+						LoginList l = (LoginList) ois.readObject();
+						System.out.println(l.getList().get(0));
+						lobby.setList(l);
+						lobby.addList();
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}					
+					
 				}
 				else{
 					login.loginFail();
@@ -98,7 +110,17 @@ public class ServerAccess extends Thread{
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				
+			}
+			
+			if(response.startsWith("in")){
+				String p = response.split(",")[1];
+				System.out.println(p + " 추가");
+				lobby.addList(p);
+			}
+			
+			if(response.startsWith("out")){
+				String p = response.split(",")[1];
+				lobby.delList(p);
 			}
 			
 			if(response.startsWith("start")){					// 게임 시작

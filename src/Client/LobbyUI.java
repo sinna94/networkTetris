@@ -1,20 +1,26 @@
 package Client;
 
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
+import java.util.Vector;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
-import java.awt.Color;
+
+import Communication.LoginList;
 
 public class LobbyUI extends JFrame implements ActionListener, KeyListener {
 
@@ -23,10 +29,15 @@ public class LobbyUI extends JFrame implements ActionListener, KeyListener {
 	private JTextArea chatArea;
 	private JButton btnGameStart;
 	private JButton btnExit;
-	JScrollPane scrollPane;
+	private JScrollPane scrollPane;
 	private ServerAccess sa;
-	LoadingUi loading;
-	JButton btnRecord;
+	private LoadingUi loading;
+	private JButton btnRecord;
+	private JScrollPane listPane;
+	private JList<String> playerList;
+	private DefaultListModel<String> lm;
+	private Vector<String> listv;
+	private LoginList l = new LoginList();	
 	
 	public LobbyUI(ServerAccess sa) {
 		
@@ -41,12 +52,12 @@ public class LobbyUI extends JFrame implements ActionListener, KeyListener {
 		contentPane.setLayout(null);
 		
 		JPanel chatPanel = new JPanel();
-		chatPanel.setBounds(12, 10, 603, 314);
+		chatPanel.setBounds(12, 10, 472, 314);
 		contentPane.add(chatPanel);
 		chatPanel.setLayout(null);
 		
 		textField = new JTextField();
-		textField.setBounds(0, 293, 603, 21);
+		textField.setBounds(0, 293, 472, 21);
 		chatPanel.add(textField);
 		textField.setColumns(10);
 		textField.addKeyListener(this);
@@ -59,7 +70,7 @@ public class LobbyUI extends JFrame implements ActionListener, KeyListener {
 		
 		scrollPane = new JScrollPane(chatArea);
 		scrollPane.setLocation(0, 0);
-		scrollPane.setSize(603, 283);
+		scrollPane.setSize(472, 283);
 		chatPanel.add(scrollPane);
 		
 		JPanel buttonPanel = new JPanel();
@@ -79,6 +90,17 @@ public class LobbyUI extends JFrame implements ActionListener, KeyListener {
 		buttonPanel.add(btnRecord);
 		buttonPanel.add(btnExit);
 		
+		listPane = new JScrollPane();
+		listPane.setBounds(496, 10, 119, 314);
+		contentPane.add(listPane);
+		
+		lm = new DefaultListModel<>();
+		listv = new Vector<>();
+		
+		playerList = new JList();
+		playerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		listPane.setViewportView(playerList);
+		
 		setVisible(true);
 	}
 	
@@ -94,6 +116,34 @@ public class LobbyUI extends JFrame implements ActionListener, KeyListener {
 	
 	public void endGame(){
 		this.setVisible(true);
+	}
+	
+	public void addList(String p){
+		lm.addElement(p);
+		playerList.setModel(lm);
+	}
+	
+	public void setList(LoginList l){
+		this.l = l;
+	}
+	
+	public void addList(){
+		listv = l.getList();
+		for(int i=0;i<listv.size();i++){
+			lm.add(i, listv.get(i));
+		}
+		playerList.setModel(lm);
+		
+	}
+	
+	public void delList(String p){
+		for(int i=0;i<lm.size();i++){
+			if(lm.get(i).equals(p)==true){
+				lm.remove(i);
+			}
+		}
+		
+		playerList.setModel(lm);
 	}
 	
 	@Override

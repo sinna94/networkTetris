@@ -71,7 +71,11 @@ public class ServerThread extends Thread{
 			if(rs.next()){										// 맞으면 결과 값이 있으니까 true
 				System.out.println("로그인 성공");
 				this.id = id;
+				sm.setLoginList(id);
 				output.println("login,true");
+				oos.writeObject(sm.getLoginList());
+				oos.reset();
+				sm.sendAllNM(this, "in,"+id);
 				break;
 			}
 			else{
@@ -163,6 +167,7 @@ public class ServerThread extends Thread{
 			e.printStackTrace();
 		} finally{
 			try {
+				sm.sendAll("out,"+id);
 				sm.socketClose(socket);
 				socket.close();
 			} catch (IOException e) {
