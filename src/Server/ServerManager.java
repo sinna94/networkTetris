@@ -21,9 +21,6 @@ public class ServerManager extends Thread{
 	
 	public void setLoginList(String id){
 		l.setList(id);
-		for(int i =0;i<l.getList().size();i++){
-			System.out.println(l.getList().get(i));
-		}
 	}
 	
 	public void sendAll(String str){
@@ -35,6 +32,7 @@ public class ServerManager extends Thread{
 	public void sendAllNM(ServerThread st, String str){
 		for(int i=0;i<vector.size();i++){
 			if(vector.get(i) != st){
+				System.out.println(str);
 				vector.get(i).sendMessage(str);
 			}
 		}

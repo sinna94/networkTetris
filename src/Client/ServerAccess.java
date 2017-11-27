@@ -70,6 +70,7 @@ public class ServerAccess extends Thread{
 						e.printStackTrace();
 					}
 				}
+			System.out.println(response);
 			
 			if(response == null){
 				continue;
@@ -78,23 +79,27 @@ public class ServerAccess extends Thread{
 			if(response.startsWith("login")){					// 로그인 정보 받기
 				String correct = response.split(",")[1];
 				if (correct.equals("true") == true) {
-					login.loginOK();
+					login.loginOK();				
+					output.println("list");
 					try {
 						LoginList l = (LoginList) ois.readObject();
-						System.out.println(l.getList().get(0));
 						lobby.setList(l);
 						lobby.addList();
 					} catch (ClassNotFoundException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
 						e.printStackTrace();
-					}					
-					
+					}	
 				}
 				else{
 					login.loginFail();
 				}
 			}
+			
+			if(response.startsWith("list")){
+				
+			}
+			
 			if(response.startsWith("chat")){					// 채팅 받기
 				String chat = response.split(",")[1];
 				lobby.addString("\n"+chat);
@@ -114,7 +119,6 @@ public class ServerAccess extends Thread{
 			
 			if(response.startsWith("in")){
 				String p = response.split(",")[1];
-				System.out.println(p + " 추가");
 				lobby.addList(p);
 			}
 			

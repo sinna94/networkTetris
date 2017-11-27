@@ -35,9 +35,10 @@ public class ServerThread extends Thread{
 		this.socket = socket;
 		this.sm = sm;
 		input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		output = new PrintWriter(socket.getOutputStream(), true);
 		ois = new ObjectInputStream(socket.getInputStream());
 		oos = new ObjectOutputStream(socket.getOutputStream());
-		output = new PrintWriter(socket.getOutputStream(), true);
+		
 		db = new ConnectDB();
 	}
 
@@ -73,8 +74,6 @@ public class ServerThread extends Thread{
 				this.id = id;
 				sm.setLoginList(id);
 				output.println("login,true");
-				oos.writeObject(sm.getLoginList());
-				oos.reset();
 				sm.sendAllNM(this, "in,"+id);
 				break;
 			}
@@ -108,6 +107,13 @@ public class ServerThread extends Thread{
 				if(response.startsWith("chat")){
 					String chat = response.split(",")[1];
 					sm.sendAll("chat," + id + " : " + chat);
+				}
+				
+				if(response.startsWith("list")){
+					oos.writeObject(sm.getLoginList());
+					oos.flush();
+					oos.reset();
+					output.println();
 				}
 				
 				if(response.startsWith("RECORD")){
@@ -167,7 +173,7 @@ public class ServerThread extends Thread{
 			e.printStackTrace();
 		} finally{
 			try {
-				sm.sendAll("out,"+id);
+				sm.sendAllNM(this, "out,"+id);
 				sm.socketClose(socket);
 				socket.close();
 			} catch (IOException e) {

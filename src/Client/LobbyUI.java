@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.DefaultListModel;
@@ -36,7 +37,7 @@ public class LobbyUI extends JFrame implements ActionListener, KeyListener {
 	private JScrollPane listPane;
 	private JList<String> playerList;
 	private DefaultListModel<String> lm;
-	private Vector<String> listv;
+	private ArrayList<String> listv;
 	private LoginList l = new LoginList();	
 	
 	public LobbyUI(ServerAccess sa) {
@@ -95,7 +96,7 @@ public class LobbyUI extends JFrame implements ActionListener, KeyListener {
 		contentPane.add(listPane);
 		
 		lm = new DefaultListModel<>();
-		listv = new Vector<>();
+		listv = new ArrayList<>();
 		
 		playerList = new JList();
 		playerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -163,8 +164,10 @@ public class LobbyUI extends JFrame implements ActionListener, KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_ENTER){
-			sa.sendMessage(textField.getText());	
-			textField.setText("");
+			if(textField.getText().equals("")==false){
+				sa.sendMessage(textField.getText());	
+				textField.setText("");
+			}
 		}
 		
 	}

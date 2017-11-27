@@ -102,7 +102,7 @@ public class RecordUI extends JFrame implements ActionListener{
 			
 			date = r.getDate();
 			System.out.println(winner);
-			String [] data = {String.valueOf(i), winner, loser, date};
+			String [] data = {String.valueOf(i+1), winner, loser, date};
 			model.addRow(data);
 		}
 		textRecord.setText("전적 [ " + (win+lose) + "전 " + win + "승 " + lose + "패 ]");
