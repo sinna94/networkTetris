@@ -25,6 +25,7 @@ public class ServerAccess extends Thread{
 	private LobbyUI lobby;
 	private LoginUI login;
 	private RecordUI record;
+	private JoinUI join;
 	
 	private String userId;
 	
@@ -57,6 +58,10 @@ public class ServerAccess extends Thread{
 		this.record = record;
 	}
 		
+	public void setJoin(JoinUI join){
+		this.join = join;
+	}
+	
 	public void run(){
 		while(isRun){
 			String response = null;

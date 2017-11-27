@@ -93,6 +93,7 @@ public class LoginUI extends JFrame implements ActionListener {
 		else if (e.getSource() == cancelButton) {
 			System.exit(1);
 		} else if (e.getSource() == joinButton) {
+			new JoinUI(sa);
 
 		}
 	}

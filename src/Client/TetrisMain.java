@@ -12,7 +12,6 @@ public class TetrisMain {
 			login.setVisible(true);
 		} catch (IOException e) {
 			sa.closeSocket();
-			//e.printStackTrace();
 		}
 	}
 }
