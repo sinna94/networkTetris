@@ -87,6 +87,7 @@ public class LoginUI extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == loginButton) {
+			ServerAccess.output.println("LOGIN");
 			sa.login(idField.getText(), passwordField.getText());
 		}
 	

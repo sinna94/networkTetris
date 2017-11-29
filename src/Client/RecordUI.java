@@ -101,7 +101,6 @@ public class RecordUI extends JFrame implements ActionListener{
 			}
 			
 			date = r.getDate();
-			System.out.println(winner);
 			String [] data = {String.valueOf(i+1), winner, loser, date};
 			model.addRow(data);
 		}

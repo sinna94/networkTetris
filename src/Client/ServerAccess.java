@@ -8,9 +8,9 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import Communication.Account;
-import Communication.DataList;
-import Communication.LoginList;
+import javax.swing.JOptionPane;
+
+import Communication.*;
 
 public class ServerAccess extends Thread{
 	public Socket socket;
@@ -75,17 +75,16 @@ public class ServerAccess extends Thread{
 						e.printStackTrace();
 					}
 				}
-			System.out.println(response);
 			
 			if(response == null){
 				continue;
 			}
 			
-			if(response.startsWith("login")){					// 로그인 정보 받기
+			if(response.startsWith("LOGIN")){					// 로그인 정보 받기
 				String correct = response.split(",")[1];
 				if (correct.equals("true") == true) {
 					login.loginOK();				
-					output.println("list");
+					output.println("LIST");
 					try {
 						LoginList l = (LoginList) ois.readObject();
 						lobby.setList(l);
@@ -101,16 +100,21 @@ public class ServerAccess extends Thread{
 				}
 			}
 			
-			if(response.startsWith("list")){
-				
+			if(response.startsWith("JFAIL")){									// 아이디 중복으로 회원 가입 실패
+				JOptionPane.showMessageDialog(null, "아이디가 중복됩니다.");
 			}
 			
-			if(response.startsWith("chat")){					// 채팅 받기
+			if(response.startsWith("JSUCC")){									// 회원 가입 성공
+				JOptionPane.showMessageDialog(null, "회원가입 성공");
+				join.dispose();
+			}
+			
+			if(response.startsWith("CHAT")){					// 채팅 받기
 				String chat = response.split(",")[1];
 				lobby.addString("\n"+chat);
 			}
 			
-			if(response.startsWith("record")){
+			if(response.startsWith("RECORD")){
 				try {
 					DataList list = (DataList) ois.readObject();
 					record.setRecord(list);
@@ -122,17 +126,17 @@ public class ServerAccess extends Thread{
 				}
 			}
 			
-			if(response.startsWith("in")){
+			if(response.startsWith("IN")){
 				String p = response.split(",")[1];
 				lobby.addList(p);
 			}
 			
-			if(response.startsWith("out")){
+			if(response.startsWith("OUT")){
 				String p = response.split(",")[1];
 				lobby.delList(p);
 			}
 			
-			if(response.startsWith("start")){					// 게임 시작
+			if(response.startsWith("START")){					// 게임 시작
 				try {
 					System.out.println("게임을 시작합니다.");
 					lobby.runGame();
@@ -160,11 +164,11 @@ public class ServerAccess extends Thread{
 	}
 
 	public void startGame(){
-		output.println("start");
+		output.println("START");
 	}
 	
 	public void sendMessage(String text) {
-		output.println("chat," + text);
+		output.println("CHAT," + text);
 		
 	}
 	

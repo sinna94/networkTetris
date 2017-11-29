@@ -58,29 +58,40 @@ public class ServerThread extends Thread{
 		this.socketOn = socketOn;
 	}
 	
-	public void receiveAccount() throws ClassNotFoundException, IOException, SQLException{
-		while (true) {
-			Account account = (Communication.Account) ois.readObject();		// account  객체 클라이언트에서 전송 받음
-			
-			if(account == null){
-				continue;
-			}
-			String id = account.getId();						// 디비에 있는 계정 정보와 맞는지 확인
-			String pw = account.getPw();
-			ResultSet rs = db.getQueryResult("SELECT id, pw FROM tetris.account WHERE id = '" + id + "' and pw = '" + pw + "';");
+	public void receiveAccount() throws ClassNotFoundException, IOException, SQLException {
+		Account account = (Communication.Account) ois.readObject(); 
 
-			if(rs.next()){										// 맞으면 결과 값이 있으니까 true
-				System.out.println("로그인 성공");
-				this.id = id;
-				sm.setLoginList(id);
-				output.println("login,true");
-				sm.sendAllNM(this, "in,"+id);
-				break;
-			}
-			else{
-				System.out.println("로그인 실패");
-				output.println("login,false");
-			}
+		String id = account.getId(); // 디비에 있는 계정 정보와 맞는지 확인
+		String pw = account.getPw();
+		ResultSet rs = db
+				.getQueryResult("SELECT id, pw FROM tetris.account WHERE id = '" + id + "' and pw = '" + pw + "';");
+
+		if (rs.next()) { // 맞으면 결과 값이 있으니까 true
+			System.out.println("로그인 성공");
+			this.id = id;
+			sm.setLoginList(id);
+			output.println("LOGIN,true");
+			sm.sendAllNM(this, "IN," + id);
+		} else {
+			System.out.println("로그인 실패");
+			output.println("LOGIN,false");
+		}
+
+	}
+	
+	public void joinM() throws ClassNotFoundException, IOException, SQLException{			// 회원가입
+		Account account = (Account) ois.readObject();
+		String id = account.getId();
+		String pw = account.getPw();
+		
+		ResultSet rs = db.getQueryResult("SELECT id FROM tetris.account WHERE id = '" + id + "';");
+		
+		if(rs.next()){
+			output.println("JFAIL");
+		}
+		else{
+			db.noExcuteQuery("INSERT INTO tetris.account (id, pw) VALUES ('" + id + "','" + pw + "');");
+			output.println("JSUCC");
 		}
 	}
 	
@@ -96,24 +107,30 @@ public class ServerThread extends Thread{
 	@Override
 	public void run() {		
 		try {
-			receiveAccount();										// 로그인 
-			System.out.println("로그인 완료");
 			while(socketOn){
 				String response = input.readLine();
 				if(response == null){
 					continue;
 				}
-								
-				if(response.startsWith("chat")){
-					String chat = response.split(",")[1];
-					sm.sendAll("chat," + id + " : " + chat);
+					
+				if(response.startsWith("LOGIN")){							// 로그인 요청
+					receiveAccount();		
 				}
 				
-				if(response.startsWith("list")){
+				if(response.startsWith("CHAT")){
+					String chat = response.split(",")[1];
+					sm.sendAll("CHAT," + id + " : " + chat);
+				}
+				
+				if(response.startsWith("LIST")){
 					oos.writeObject(sm.getLoginList());
 					oos.flush();
 					oos.reset();
 					output.println();
+				}
+				
+				if(response.startsWith("JOIN")){							// 회원 가입 요청
+					joinM();
 				}
 				
 				if(response.startsWith("RECORD")){
@@ -128,15 +145,16 @@ public class ServerThread extends Thread{
 						recordList.add(record);
 					}
 					
-					output.println("record");
+					output.println("RECORD");
 					DataList list = new DataList();
 					list.setList(recordList);
+					oos.reset();
 					oos.writeObject(list);
 					oos.flush();
 					oos.reset();
 				}
 				
-				if(response.startsWith("start")){					// 클라이언트가 게임 시작을 누름
+				if(response.startsWith("START")){					// 클라이언트가 게임 시작을 누름
 					sm.addReadyQueue(this);
 				}
 				
@@ -173,7 +191,7 @@ public class ServerThread extends Thread{
 			e.printStackTrace();
 		} finally{
 			try {
-				sm.sendAllNM(this, "out,"+id);
+				sm.sendAllNM(this, "OUT,"+id);
 				sm.socketClose(socket);
 				socket.close();
 			} catch (IOException e) {

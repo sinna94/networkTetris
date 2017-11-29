@@ -32,7 +32,6 @@ public class ServerManager extends Thread{
 	public void sendAllNM(ServerThread st, String str){
 		for(int i=0;i<vector.size();i++){
 			if(vector.get(i) != st){
-				System.out.println(str);
 				vector.get(i).sendMessage(str);
 			}
 		}
@@ -46,11 +45,12 @@ public class ServerManager extends Thread{
 	public void socketClose(Socket s) throws IOException{
 		for(int i=0;i<vector.size();i++){
 			if(vector.get(i).getSocket() == s){
+				if(vector.get(i).getID() != null)
+					l.remove(i);
+				
 				vector.get(i).setSocketOn(false);
 				vector.get(i).getSocket().close();
 				vector.remove(i);
-				
-				l.remove(i);
 				
 				System.out.println("立加 辆丰, 立加磊 荐 : " + vector.size());
 			}
